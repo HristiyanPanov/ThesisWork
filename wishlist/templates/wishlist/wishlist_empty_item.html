@@ -1,0 +1,15 @@
+<!-- Placeholder за премахнат елемент -->
+<div style="display: none;" data-removed-wishlist-item="{{ product_id }}"></div>
+
+<script>
+    htmx.ajax('GET', '{% url "wishlist:wishlist_button" %}', {
+        target: '#wishlist-button',
+        swap: 'outerHTML'
+    });
+
+    // Ако няма останали wishlist елементи, презареди целия модал
+    htmx.ajax('GET', '{% url "wishlist:wishlist_modal" %}', {
+        target: '#wishlist-container',
+        swap: 'innerHTML'
+    });
+</script>

@@ -79,5 +79,12 @@
             this.parentElement.classList.remove('focused');
         });
     });
+
+    document.body.addEventListener("htmx:afterOnLoad", function(event) {
+        const redirect = event.detail.xhr.getResponseHeader("HX-Redirect");
+        if (redirect) {
+            window.location.href = redirect;
+        }
+    });
 </script>
 {% endblock %}

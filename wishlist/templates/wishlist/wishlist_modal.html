@@ -1,0 +1,48 @@
+<div id="wishlist-container">
+  <div id="wishlist-modal" class="fixed right-0 top-0 h-screen w-full max-w-md bg-white shadow-2xl z-50 transition-transform duration-300">
+    <div class="h-full flex flex-col">
+      
+      <!-- Header -->
+      <div class="flex justify-between items-center p-6 border-b">
+        <h1 class="text-2xl font-bold">
+          WISHLIST (<span id="wishlist-count">{{ wishlist_count }}</span>)
+        </h1>
+        <button onclick="closeWishlistModal()" class="text-2xl hover:text-gray-600">×</button>
+      </div>
+
+      <!-- Body -->
+      <div class="flex-1 overflow-y-auto p-6">
+        {% if items %}
+          <div id="wishlist-items">
+            {% include 'wishlist/wishlist_list.html' with items=items only %}
+          </div>
+        {% else %}
+          <div class="h-full flex flex-col items-center justify-start text-center text-gray-500 pt-20 mt-10">
+            <p class="mb-4 text-lg">Your wishlist is empty</p>
+            <a href="/" class="text-sm text-gray-600 underline hover:text-black">
+              Continue browsing
+            </a>
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- Footer -->
+      {% if items %}
+      <div class="border-t p-6">
+        <button 
+          hx-post="{% url 'wishlist:clear' %}" 
+          hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' 
+          hx-target="#wishlist-container"
+          hx-swap="innerHTML"
+          class="w-full block bg-black text-white py-3 px-6 text-sm font-medium text-center uppercase hover:bg-gray-800 transition-colors">
+          Clear Wishlist
+        </button>
+      </div>
+      {% endif %}
+
+    </div>
+  </div>
+
+  <!-- Overlay -->
+  <div id="wishlist-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-40 transition-all duration-300" onclick="closeWishlistModal()"></div>
+</div>

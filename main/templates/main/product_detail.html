@@ -89,7 +89,7 @@
             </div>
             {% endif %}
 
-            <!-- Add to Cart -->
+            <!-- Buttons -->
             <div class="space-y-4">
                 <button id="add-to-cart-btn" 
                         class="w-full bg-black text-white py-3 px-6 text-sm font-medium hover:bg-gray-800 transition-colors"
@@ -98,10 +98,47 @@
                     ADD TO CART
                 </button>
                 
-                <button class="w-full border border-gray-300 py-3 px-6 text-sm font-medium hover:border-gray-900 transition-colors">
+                <form id="add-to-wishlist-form" 
+                    action="{% url 'wishlist:add_to_wishlist' product.id %}" 
+                    method="post">
+                    {% csrf_token %}
+                </form>
+
+                {% if not user.is_authenticated %}
+                <a href="{% url 'users:login' %}?next={{ request.path }}"
+                hx-get="{% url 'users:login' %}?next={{ request.path }}"
+                hx-target="#main-content"
+                hx-push-url="true"
+                class="w-full block bg-white text-black border border-black py-3 px-6 text-sm font-medium uppercase hover:bg-gray-100 transition-colors text-center"
+                {% if not product.product_sizes.all %}style="pointer-events: none; opacity: 0.5;"{% endif %}>
+                    ADD TO WISHLIST
+                </a>
+                {% else %}
+                <button id="add-to-wishlist-btn"
+                        data-authenticated="true"
+                        data-product-id="{{ product.id }}"
+                        class="w-full block bg-white text-black border border-black py-3 px-6 text-sm font-medium uppercase hover:bg-gray-100 transition-colors text-center"
+                        onclick="handleWishlistClick(this)"
+                        {% if not product.product_sizes.all %}disabled{% endif %}>
                     ADD TO WISHLIST
                 </button>
+                {% endif %}
+
+
+        
+                {% comment %} </button>
+                
+                <button class="w-full border border-gray-300 py-3 px-6 text-sm font-medium hover:border-gray-900 transition-colors">
+                    ADD TO WISHLIST
+                </button> {% endcomment %}
             </div>
+
+            <!-- Hidden Wishlist Form -->
+            <form id="add-to-wishlist-form" method="POST" action="{% url 'wishlist:add_to_wishlist' product.id %}" style="display: none;">
+                {% csrf_token %}
+                <input type="hidden" name="size_id" id="wishlist-size-id" value="">
+            </form>
+
 
             <!-- Product Details -->
             <div class="border-t border-gray-200 pt-6">
@@ -206,6 +243,7 @@
             showNotification('Please select a size');
             return;
         }
+    
 
         let formData = new FormData();
         formData.append('size_id', selectedSizeId);
@@ -239,6 +277,82 @@
             showNotification('Error adding to cart');
         });
     }
+
+
+    async function addToWishlist() {
+        const selectedSize = document.querySelector('input[name="size"]:checked');
+        if (!selectedSize) {
+            showNotification("Please select a size");
+            return;
+        }
+
+        const sizeId = selectedSize.value;
+        const productId = document.getElementById("add-to-wishlist-btn").dataset.productId;
+
+        const formData = new FormData();
+        formData.append("size_id", sizeId);
+
+        try {
+            const response = await fetch(`/wishlist/add/${productId}/`, {
+                method: "POST",
+                headers: {
+                    "X-CSRFToken": getCookie("csrftoken")
+                },
+                body: formData
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                showNotification(data.message); // 🟢 Toast известие
+                // Презареждаме wishlist модала
+                htmx.ajax('GET', '/wishlist/modal/', {
+                    target: '#wishlist-container',
+                    swap: 'innerHTML'
+                });
+                // Обновяваме брояча в хедъра
+                const countSpan = document.querySelector('#wishlist-button #wishlist-count');
+                if (countSpan) {
+                    countSpan.textContent = data.count;
+                }
+            } else {
+                showNotification(data.error || "Something went wrong");
+            }
+
+        } catch (error) {
+            console.error("Wishlist Error:", error);
+            showNotification("Error adding to wishlist");
+        }
+    }
+
+
+    function ensureToastContainer() {
+        let c = document.getElementById('toast-container');
+        if (!c) {
+            c = document.createElement('div');
+            c.id = 'toast-container';
+            c.className = 'fixed top-4 right-4 z-50 space-y-2';
+            document.body.appendChild(c);
+        }
+        return c;
+    }
+
+
+    function handleWishlistClick(button) {
+        const isAuth = button.dataset.authenticated === "true";
+        if (!isAuth) {
+            const loginUrl = button.dataset.loginUrl;
+
+            // форсирай пълно зареждане извън HTMX
+            window.location.replace(loginUrl);
+            return;
+        }
+
+        updateSelectedSize();
+        addToWishlist();
+    }
+
+
     
     function getCookie(name) {
         let cookieValue = null;
@@ -334,4 +448,25 @@
             this.style.transform = 'translateY(0)';
         });
     });
+
+
+document.addEventListener('DOMContentLoaded', function () {
+    const wishlistForm = document.querySelector('form[action*="wishlist:add"]');
+    const sizeInputs = document.querySelectorAll('input[name="size"]');
+    const hiddenSizeInput = document.getElementById('wishlist-size-id');
+
+    if (wishlistForm && hiddenSizeInput) {
+        wishlistForm.addEventListener('submit', function (e) {
+            const selectedSize = Array.from(sizeInputs).find(input => input.checked);
+            if (!selectedSize) {
+                e.preventDefault();
+                showNotification('Please select a size before adding to wishlist');
+                return;
+            }
+
+            hiddenSizeInput.value = selectedSize.value;
+        });
+    }
+});
+
 </script>

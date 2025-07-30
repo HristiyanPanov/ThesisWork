@@ -4,6 +4,7 @@ from django.http import HttpResponse
 from django.template.response import TemplateResponse
 from .models import Category, Product, Size
 from django.db.models import Q
+from wishlist.forms import AddToWishlistForm
 
 
 class IndexView(TemplateView):
@@ -25,7 +26,7 @@ class IndexView(TemplateView):
     
 
 class CatalogView(TemplateView):
-    template = 'main/base.html'
+    template_name = 'main/base.html'
 
     FILTER_MAPPING = {
         'color': lambda queryset, value: queryset.filter(color__iexact=value),
@@ -107,6 +108,8 @@ class ProductDetailView(DetailView):
             category=product.category
         ).exclude(id=product.id)[:4]
         context['current_category'] = product.category.slug
+        context['wishlist_form'] = AddToWishlistForm(product=product, user=self.request.user)
+
         return context
     
 

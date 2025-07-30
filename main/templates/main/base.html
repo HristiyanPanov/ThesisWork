@@ -106,6 +106,34 @@
         .htmx-request.htmx-indicator {
             opacity: 1;
         }
+
+        #wishlist-overlay {
+        opacity: 0;
+        visibility: hidden;
+        }
+        #wishlist-overlay.open {
+        opacity: 1;
+        visibility: visible;
+        }
+        #wishlist-overlay.closed {
+        opacity: 0;
+        visibility: hidden;
+        }
+
+        .dotted-input {
+        border: none;
+        border-bottom: 2px dotted #d1d5db;
+        background: transparent;
+        outline: none;
+        transition: border-color 0.3s ease;
+        }
+        .dotted-input:focus {
+            border-bottom-color: #374151;
+        }
+        .dotted-input::placeholder {
+            color: #6b7280;
+            font-weight: 500;
+        }
     </style>
 </head>
 <body class="bg-white">
@@ -215,6 +243,9 @@
                     <a class="text-sm font-medium text-gray-900 uppercase hover:text-gray-600">
                         ACCOUNT
                     </a>
+
+                    {% include "wishlist/includes/wishlist_button.html" %}
+
                     <a href="#" id="desktopCart" class="text-sm font-medium text-gray-900 hover:text-gray-700">CART (0)</a>
                 </div>
                 
@@ -226,6 +257,14 @@
         </div>
     </header>
     <div id="cart-container"></div>
+    <!-- Mounts for dynamic wishlist content -->
+    <div id="wishlist-container"></div>
+
+    <div id="wishlist-toast-container"></div>
+
+    <div id="login-modal-container"></div>
+
+
 
     <!-- Loading Indicator -->
     <div class="htmx-indicator fixed top-0 left-0 w-full h-1 bg-black z-50"></div>
@@ -329,6 +368,7 @@
                     });
                 }
             });
+
     
             // Close mobile menu on window resize
             window.addEventListener('resize', function() {
@@ -373,6 +413,67 @@
             if (mobileCart) mobileCart.textContent = cartText;
             if (mobileCartHeader) mobileCartHeader.textContent = cartText;
         };
+
+            function handleWishlistButtonClick(btn) {
+            const isAuth = btn.dataset.authenticated === "true";
+            const url = btn.dataset.url;
+
+            if (!isAuth) {
+                htmx.ajax('GET', "{% url 'users:login' %}?next=/wishlist/modal/", {
+                    target: '#main-content',
+                    pushUrl: true,
+                    swap: 'innerHTML'
+                });
+                return;
+            }
+
+            htmx.ajax('GET', url, {
+                target: '#wishlist-container',
+                swap: 'innerHTML'
+            });
+        }
+
+
+            function closeWishlistModal() {
+            const c = document.getElementById('wishlist-container');
+            if (c) c.innerHTML = '';
+            }
+
+            document.addEventListener('htmx:afterSwap', function (evt) {
+            // When the modal HTML lands in #wishlist-container, it’s ready
+            if (evt.detail.elt.id === 'wishlist-container') {
+                // nothing else needed if you don't animate
+            }
+            });
+
+            // Optional helper if you want to update the header count manually somewhere
+            function updateWishlistCount(count) {
+            const el = document.getElementById('wishlist-count');
+            if (el) el.textContent = count;
+            }
+
+            document.addEventListener("htmx:configRequest", function(event) {
+                const csrfToken = getCookie("csrftoken");
+                if (csrfToken) {
+                    event.detail.headers["X-CSRFToken"] = csrfToken;
+                }
+            });
+
+            function getCookie(name) {
+                let cookieValue = null;
+                if (document.cookie && document.cookie !== "") {
+                    const cookies = document.cookie.split("; ");
+                    for (let i = 0; i < cookies.length; i++) {
+                        const [key, value] = cookies[i].split("=");
+                        if (key === name) {
+                            cookieValue = decodeURIComponent(value);
+                            break;
+                        }
+                    }
+                }
+                return cookieValue;
+            }
+
     </script>
 </body>
 </html>

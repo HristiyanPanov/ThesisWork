@@ -1,0 +1,10 @@
+<!-- wishlist_items_list.html -->
+<div id="wishlist-items" class="p-6">
+    {% if items %}
+        {% for item in items %}
+            {% include "wishlist/wishlist_item.html" with item=item %}
+        {% endfor %}
+    {% else %}
+        {% include "wishlist/wishlist_empty.html" %}
+    {% endif %}
+</div>

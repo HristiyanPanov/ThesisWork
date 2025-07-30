@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'users',
     'orders',
     'payment',
+    'wishlist',
 ]
 
 MIDDLEWARE = [
@@ -59,6 +60,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 
     'cart.middleware.CartMiddleware',
+    
 ]
 
 ROOT_URLCONF = 'ThesisWork.urls'
@@ -75,6 +77,7 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
 
                 'cart.context_processors.cart_processor',
+                'wishlist.context_processors.wishlist_count',
             ],
         },
     },

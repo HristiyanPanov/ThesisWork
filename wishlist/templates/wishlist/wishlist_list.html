@@ -1,0 +1,7 @@
+{% if items %}
+  {% for item in items %}
+    {% include "wishlist/wishlist_item.html" with item=item only %}
+  {% endfor %}
+{% else %}
+  {% include "wishlist/wishlist_empty.html" %}
+{% endif %}

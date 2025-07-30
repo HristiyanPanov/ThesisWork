@@ -1,0 +1,23 @@
+<!--toast-split-->
+<div id="wishlist-notification" class="fixed top-20 right-4 bg-black text-white px-6 py-3 rounded shadow-lg z-50 transform translate-x-full transition-transform duration-300">
+    <div class="flex items-center space-x-3">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+        </svg>
+        <span>{{ message }}</span>
+    </div>
+</div>
+
+<script>
+    setTimeout(() => {
+        const el = document.getElementById('wishlist-notification');
+        if (el) el.style.transform = 'translateX(0)';
+    }, 10);
+
+    setTimeout(() => {
+        const el = document.getElementById('wishlist-notification');
+        if (!el) return;
+        el.style.transform = 'translateX(100%)';
+        setTimeout(() => el.remove(), 300);
+    }, 3000);
+</script>

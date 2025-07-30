@@ -25,15 +25,21 @@ def register(request):
 
 
 def login_view(request):
-    if request.method == 'POST':
-        form = CustomUserLoginForm(request=request, data=request.POST)
-        if form.is_valid():
-            user = form.get_user()
-            login(request, user, backend='django.contrib.auth.backends.ModelBackend')
-            return redirect('main:index')
-    else:
-        form = CustomUserLoginForm()
+    form = CustomUserLoginForm(request=request, data=request.POST if request.method == 'POST' else None)
+
+    if request.method == 'POST' and form.is_valid():
+        user = form.get_user()
+        login(request, user, backend='django.contrib.auth.backends.ModelBackend')
+
+        next_url = request.GET.get('next') or reverse('main:index')
+        if request.headers.get("HX-Request"):
+            return HttpResponse(headers={'HX-Redirect': next_url})
+        return redirect(next_url)
+
     return render(request, 'users/login.html', {'form': form})
+
+
+
     
 
 @login_required(login_url='/users/login')
