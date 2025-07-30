@@ -13,4 +13,7 @@ urlpatterns = [
     path('logout/', views.logout_view, name='logout'),
     path('order-history/', views.order_history, name='order_history'),
     path('order/<int:order_id>/', views.order_detail, name='order_detail'),
+    path("password-reset/", views.password_reset_request, name="password_reset_request"),
+    path("reset/<uidb64>/<token>/", views.password_reset_confirm, name="password_reset_confirm"),
+
 ]

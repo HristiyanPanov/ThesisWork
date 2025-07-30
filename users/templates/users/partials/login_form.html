@@ -1,28 +1,9 @@
-{% extends 'main/base.html' %}
-{% block content %}
-<style>
-    .dotted-input {
-        border: none;
-        border-bottom: 2px dotted #d1d5db;
-        background: transparent;
-        outline: none;
-        transition: border-color 0.3s ease;
-    }
-    .dotted-input:focus {
-        border-bottom-color: #374151;
-    }
-    .dotted-input::placeholder {
-        color: #6b7280;
-        font-weight: 500;
-    }
-</style>
-
 <div class="min-h-screen flex items-center justify-center">
     <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
         <h1 class="text-2xl font-bold text-gray-900 mb-8 text-center tracking-wide">
             LOG IN
         </h1>
-        
+
         {% if messages %}
             <div class="mb-4">
                 {% for message in messages %}
@@ -30,8 +11,8 @@
                 {% endfor %}
             </div>
         {% endif %}
-        
-        <form id="loginForm" method="post" class="space-y-6" 
+
+        <form method="post" class="space-y-6" 
               hx-post="{% url 'users:login' %}" 
               hx-target="#main-content">
             {% csrf_token %}
@@ -51,16 +32,13 @@
             </div>
 
             <div class="text-right">
-                <a 
-                    href="{% url 'users:password_reset_request' %}"
-                    hx-get="{% url 'users:password_reset_request' %}"
-                    hx-target="#main-content"
-                    hx-push-url="true"
-                    class="text-xs text-gray-500 hover:text-black underline"
-                >
+                <a href="{% url 'users:password_reset_request' %}"
+                   hx-get="{% url 'users:password_reset_request' %}"
+                   hx-target="#main-content"
+                   hx-push-url="true"
+                   class="text-xs text-gray-500 hover:text-black underline">
                     FORGOT PASSWORD?
                 </a>
-
             </div>
 
             <div class="grid grid-cols-2 gap-4 pt-4">
@@ -83,22 +61,3 @@
         </form>
     </div>
 </div>
-
-<script>
-    document.querySelectorAll('.dotted-input').forEach(input => {
-        input.addEventListener('focus', function() {
-            this.parentElement.classList.add('focused');
-        });
-        input.addEventListener('blur', function() {
-            this.parentElement.classList.remove('focused');
-        });
-    });
-
-    document.body.addEventListener("htmx:afterOnLoad", function(event) {
-        const redirect = event.detail.xhr.getResponseHeader("HX-Redirect");
-        if (redirect) {
-            window.location.href = redirect;
-        }
-    });
-</script>
-{% endblock %}

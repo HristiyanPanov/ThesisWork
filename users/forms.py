@@ -100,20 +100,32 @@ class CustomUserUpdateForm(forms.ModelForm):
             'postal_code': forms.TextInput(attrs={'class': 'dotted-input w-full py-3 text-sm font-medium text-gray-900 placeholder-gray-500', 'placeholder': 'POSTAL CODE'}),
         }
         
-    
-    def clean_email(self):
-        email = self.cleaned_data.get('email')
-        if email and User.objects.filter(email=email).exclude(id=self.instance.id).exists():
-            raise forms.ValidationError('This email is alredy in use.')
-        return email
-    
+class PasswordResetRequestForm(forms.Form):
+    email = forms.EmailField(
+        label="",
+        widget=forms.EmailInput(attrs={
+            'class': 'dotted-input w-full py-3 text-sm font-medium text-gray-900 placeholder-gray-500',
+            'placeholder': 'EMAIL'
+        })
+    )
+
+
+
+class SetNewPasswordForm(forms.Form):
+    new_password1 = forms.CharField(
+        label="New password",
+        widget=forms.PasswordInput(attrs={'class': 'dotted-input w-full py-3 text-sm font-medium text-gray-900 placeholder-gray-500', 'placeholder': 'NEW PASSWORD'})
+    )
+    new_password2 = forms.CharField(
+        label="Confirm password",
+        widget=forms.PasswordInput(attrs={'class': 'dotted-input w-full py-3 text-sm font-medium text-gray-900 placeholder-gray-500', 'placeholder': 'CONFIRM PASSWORD'})
+    )
 
     def clean(self):
         cleaned_data = super().clean()
-        if not cleaned_data.get('email'):
-            cleaned_data['email'] = self.instance.email
-        for field in ['company', 'address1', 'address2', 'city', 'country',
-                      'province', 'postal_code', 'phone']:
-            if cleaned_data.get(field):
-                cleaned_data[field] = strip_tags(cleaned_data[field])
+        pw1 = cleaned_data.get("new_password1")
+        pw2 = cleaned_data.get("new_password2")
+
+        if pw1 and pw2 and pw1 != pw2:
+            raise forms.ValidationError("Passwords do not match.")
         return cleaned_data

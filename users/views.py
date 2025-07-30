@@ -10,6 +10,18 @@ from .models import CustomUser
 from django.contrib import messages
 from main.models import Product
 from orders.models import Order
+from django.contrib.auth.tokens import default_token_generator
+from django.utils.http import urlsafe_base64_encode
+from django.utils.encoding import force_bytes
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
+from django.conf import settings
+from .forms import PasswordResetRequestForm
+from django.utils.http import urlsafe_base64_decode
+from django.contrib.auth import get_user_model
+from django.contrib.auth.hashers import make_password
+from .forms import SetNewPasswordForm
+
 
 
 def register(request):
@@ -36,11 +48,60 @@ def login_view(request):
             return HttpResponse(headers={'HX-Redirect': next_url})
         return redirect(next_url)
 
-    return render(request, 'users/login.html', {'form': form})
+    if request.headers.get("HX-Request"):
+        return render(request, "users/partials/login_form.html", {"form": form})
+    return render(request, "users/login.html", {"form": form})
 
 
+def password_reset_request(request):
+    if request.method == "POST":
+        form = PasswordResetRequestForm(request.POST)
+        if form.is_valid():
+            email = form.cleaned_data["email"]
+            try:
+                user = CustomUser.objects.get(email=email)
+                subject = "Password Reset Requested"
+                context = {
+                    "user": user,
+                    "domain": request.get_host(),
+                    "uid": urlsafe_base64_encode(force_bytes(user.pk)),
+                    "token": default_token_generator.make_token(user),
+                }
+                message = render_to_string("users/password_reset_email.html", context)
+                send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [user.email])
+                messages.success(request, "Email sent with password reset instructions.")
+                return redirect("users:password_reset_request")
+            except CustomUser.DoesNotExist:
+                messages.error(request, "No account found with that email.")
+    else:
+        form = PasswordResetRequestForm()
+    if request.headers.get("HX-Request"):
+        return render(request, "users/partials/password_reset_form.html", {"form": form})
+    return render(request, "users/password_reset_form.html", {"form": form})
 
-    
+
+def password_reset_confirm(request, uidb64, token):
+    User = get_user_model()
+    try:
+        uid = urlsafe_base64_decode(uidb64).decode()
+        user = User.objects.get(pk=uid)
+    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+        user = None
+
+    if user is not None and default_token_generator.check_token(user, token):
+        if request.method == "POST":
+            form = SetNewPasswordForm(request.POST)
+            if form.is_valid():
+                user.password = make_password(form.cleaned_data["new_password1"])
+                user.save()
+                messages.success(request, "Your password has been reset. You can now log in.")
+                return redirect("users:login")
+        else:
+            form = SetNewPasswordForm()
+        return render(request, "users/password_reset_confirm.html", {"form": form})
+    else:
+        messages.error(request, "The password reset link is invalid or has expired.")
+        return redirect("users:password_reset_request")    
 
 @login_required(login_url='/users/login')
 def profile_view(request):
