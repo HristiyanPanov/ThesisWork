@@ -22,40 +22,45 @@
             
             <!-- Quantity Controls -->
             <div class="flex items-center justify-center mt-2">
+                <!-- Minus button -->
                 <button class="w-6 h-6 flex items-center justify-center border border-gray-300 hover:bg-gray-100"
                         hx-post="{% url 'cart:update_item' item.id %}"
                         hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
-                        hx-vals='{"quantity": "{{ item.quantity|add:-1 }}"}'
-                        hx-target="#cart-modal"
-                        hx-swap="outerHTML"
+                        hx-vals='{"quantity": {{ item.quantity|add:-1 }} }'
+                        hx-target="#cart-container"
+                        hx-swap="innerHTML"
                         hx-trigger="click"
                         hx-on::after-request="console.log('Update Quantity (-1) Request Completed for Item {{ item.id }}');"
                         {% if item.quantity <= 1 %}disabled class="opacity-50 cursor-not-allowed"{% endif %}>
                     −
                 </button>
+
+                <!-- Quantity display -->
                 <span class="mx-3 w-8 text-center">{{ item.quantity }}</span>
+
+                <!-- Plus button -->
                 <button class="w-6 h-6 flex items-center justify-center border border-gray-300 hover:bg-gray-100"
                         hx-post="{% url 'cart:update_item' item.id %}"
                         hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
-                        hx-vals='{"quantity": "{{ item.quantity|add:1 }}"}'
-                        hx-target="#cart-modal"
-                        hx-swap="outerHTML"
+                        hx-vals='{"quantity": {{ item.quantity|add:1 }} }'
+                        hx-target="#cart-container"
+                        hx-swap="innerHTML"
                         hx-trigger="click"
                         hx-on::after-request="console.log('Update Quantity (+1) Request Completed for Item {{ item.id }}');">
                     +
                 </button>
             </div>
+
             
             <!-- Remove button -->
             <button class="mt-2 text-xs text-gray-500 underline hover:text-gray-700"
                     hx-post="{% url 'cart:remove_item' item.id %}"
                     hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
-                    hx-target="#cart-modal"
-                    hx-swap="outerHTML"
-                    hx-trigger="click"
-                    hx-on::after-request="console.log('Remove Item {{ item.id }} Request Completed');">
+                    hx-target="#cart-container"
+                    hx-swap="innerHTML">
                 Remove
             </button>
+
         </div>
     </div>
 </div>

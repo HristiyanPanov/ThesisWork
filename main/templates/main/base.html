@@ -339,11 +339,20 @@
             updateCartCount();
             
             function updateHeaderCartCount(count) {
+                const desktopCart = document.getElementById('desktopCart');
+                const mobileCart = document.getElementById('mobileCart');
+                const mobileCartHeader = document.getElementById('mobileCartHeader');
+
                 const cartText = `CART (${count})`;
+
                 if (desktopCart) desktopCart.textContent = cartText;
                 if (mobileCart) mobileCart.textContent = cartText;
                 if (mobileCartHeader) mobileCartHeader.textContent = cartText;
+
+                console.log('🛒 Updated header cart count to:', cartText);
             }
+
+
             
             function updateCartCount() {
                 fetch('{% url "cart:cart_count" %}')
@@ -352,7 +361,7 @@
                         updateHeaderCartCount(data.total_items);
                     });
             }
-    
+
             function openCart() {
                 htmx.ajax('GET', '{% url "cart:cart_modal" %}', {
                     target: '#cart-container',
@@ -473,6 +482,53 @@
                 }
                 return cookieValue;
             }
+
+            window.updateCartCountFromDOM = function() {
+                const items = document.querySelectorAll('#cart-modal .cart-item');
+                updateHeaderCartCount(items.length);
+            }
+
+            function showNotification(message) {
+                const notification = document.createElement('div');
+                notification.className = 'fixed top-20 right-4 bg-black text-white px-6 py-3 rounded shadow-lg z-50 transform translate-x-full transition-transform duration-300';
+                notification.textContent = message;
+                document.body.appendChild(notification);
+                setTimeout(() => {
+                    notification.style.transform = 'translateX(0)';
+                }, 10);
+                setTimeout(() => {
+                    notification.style.transform = 'translateX(100%)';
+                    setTimeout(() => {
+                        notification.remove();
+                    }, 300);
+                }, 3000);
+            }
+
+            function updateHeaderWishlistCount(count) {
+                const el = document.querySelector('#wishlist-button #wishlist-count');
+                if (el) el.textContent = count;
+            }
+
+
+            document.addEventListener("htmx:afterSwap", function(event) {
+                // Обнови wishlist брояча
+                if (event.detail.target && event.detail.target.id === "wishlist-container") {
+                    const items = document.querySelectorAll('#wishlist-container .cart-item');
+                    updateHeaderWishlistCount(items.length);
+                }
+
+                // Обнови cart брояча
+                if (event.detail.target && event.detail.target.id === "cart-container") {
+                    const modal = document.getElementById('cart-modal');
+                    const total = modal?.dataset?.totalItems;
+                    if (total !== undefined) {
+                        updateHeaderCartCount(parseInt(total));
+                    }
+                }
+            });
+
+
+
 
     </script>
 </body>

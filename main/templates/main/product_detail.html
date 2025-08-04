@@ -67,7 +67,7 @@
                     {% for product_size in product.product_sizes.all %}
                     <div class="size-option">
                         <input type="radio" 
-                               name="size" 
+                               name="size_id" 
                                class="size-radio hidden"
                                id="size-{{ product_size.id }}"
                                value="{{ product_size.id }}"
@@ -148,7 +148,7 @@
                     <p>Created: {{ product.created_at|date:"F d, Y" }}</p>
                 </div>
             </div>
-
+            
             <!-- Care Instructions -->
             <div class="border-t border-gray-200 pt-6">
                 <h3 class="text-sm font-medium text-gray-900 mb-3">CARE</h3>
@@ -158,6 +158,28 @@
                     <p>Iron at low temperature</p>
                 </div>
             </div>
+
+            <div class="border-t border-gray-200 pt-6 mt-6">
+            {% if reviews %}
+            <div class="mb-8">
+                <h3 class="text-sm font-medium text-gray-900 mb-3">CUSTOMER REVIEWS</h3>
+                <div class="space-y-4">
+                    {% for review in reviews %}
+                    <div class="border-b pb-3">
+                        <div class="flex items-center gap-1 mb-1">
+                            <div class="flex text-yellow-400 text-sm">
+                                {% for i in "12345"|slice:":review.rating"|make_list %}★{% endfor %}
+                            </div>
+                            <span class="text-xs text-gray-500">({{ review.rating }}/5)</span>
+                        </div>
+                        <p class="font-semibold text-gray-800">{{ review.title }}</p>
+                        <p class="text-sm text-gray-700">{{ review.content }}</p>
+                        <p class="text-xs text-gray-500">{{ review.created_at|date:"F d, Y" }}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
         </div>
     </div>
 
@@ -257,15 +279,27 @@
         })
         .then(response => {
             console.log('Response Status:', response.status);
-            return response.json();
+            return response.text().then(text => {
+                console.log('Raw response text:', text);
+                try {
+                    const json = JSON.parse(text);
+                    console.log('Parsed JSON:', json);
+                    return json;
+                } catch (e) {
+                    console.error('❌ JSON parse error:', e);
+                    showNotification('Unexpected server response');
+                    return {};
+                }
+            });
         })
+
         .then(data => {
             console.log('Response Data:', data);
             if (data.error) {
                 showNotification(data.error);
             } else {
-                updateHeaderCartCount(data.total_items);
                 showNotification(data.message);
+                updateHeaderCartCount(data.total_items);
                 htmx.ajax('GET', '{% url "cart:cart_modal" %}', {
                     target: '#cart-container',
                     swap: 'innerHTML'
@@ -280,7 +314,7 @@
 
 
     async function addToWishlist() {
-        const selectedSize = document.querySelector('input[name="size"]:checked');
+        const selectedSize = document.querySelector('input[name="size_id"]:checked');
         if (!selectedSize) {
             showNotification("Please select a size");
             return;
@@ -369,21 +403,6 @@
         return cookieValue;
     }
     
-    function showNotification(message) {
-        const notification = document.createElement('div');
-        notification.className = 'fixed top-20 right-4 bg-black text-white px-6 py-3 rounded shadow-lg z-50 transform translate-x-full transition-transform duration-300';
-        notification.textContent = message;
-        document.body.appendChild(notification);
-        setTimeout(() => {
-            notification.style.transform = 'translateX(0)';
-        }, 10);
-        setTimeout(() => {
-            notification.style.transform = 'translateX(100%)';
-            setTimeout(() => {
-                notification.remove();
-            }, 300);
-        }, 3000);
-    }
 
     function initializeSizeRadios() {
         const sizeRadios = document.querySelectorAll('.size-radio');
@@ -452,7 +471,7 @@
 
 document.addEventListener('DOMContentLoaded', function () {
     const wishlistForm = document.querySelector('form[action*="wishlist:add"]');
-    const sizeInputs = document.querySelectorAll('input[name="size"]');
+    const sizeInputs = document.querySelectorAll('input[name="size_id"]');
     const hiddenSizeInput = document.getElementById('wishlist-size-id');
 
     if (wishlistForm && hiddenSizeInput) {

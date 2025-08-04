@@ -8,7 +8,7 @@ from .forms import CustomUserCreationForm, CustomUserLoginForm, \
     CustomUserUpdateForm
 from .models import CustomUser
 from django.contrib import messages
-from main.models import Product
+from main.models import Product, ProductReview
 from orders.models import Order
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.http import urlsafe_base64_encode
@@ -117,11 +117,22 @@ def profile_view(request):
 
     recommended_products = Product.objects.all().order_by('id')[:3]
 
+    # 🔥 Добавяме latest_order точно тук
+    latest_order = (
+        Order.objects
+        .filter(user=request.user)
+        .order_by('-created_at')
+        .prefetch_related('items__product', 'items__size')
+        .first()
+    )
+
     return TemplateResponse(request, 'users/profile.html', {
         'form': form,
         'user': request.user,
-        'recommended_products': recommended_products
+        'recommended_products': recommended_products,
+        'latest_order': latest_order,
     })
+
 
 
 @login_required(login_url='/users/login')
@@ -171,4 +182,17 @@ def order_history(request):
 @login_required
 def order_detail(request, order_id):
     order = get_object_or_404(Order, id=order_id, user=request.user)
-    return TemplateResponse(request, 'users/partials/order_detail.html', {'order': order})
+
+    product_ids = [item.product.id for item in order.items.all()]
+    user_reviews = ProductReview.objects.filter(user=request.user, product_id__in=product_ids)
+
+    # Сет от продуктите, които имат ревю
+    reviewed_product_ids = set(user_reviews.values_list('product_id', flat=True))
+    # Речник: {product_id: review}
+    user_reviews_by_product = {review.product_id: review for review in user_reviews}
+
+    return TemplateResponse(request, 'users/partials/order_detail.html', {
+        'order': order,
+        'reviewed_product_ids': reviewed_product_ids,
+        'user_reviews_by_product': user_reviews_by_product,
+    })

@@ -4,6 +4,12 @@
             LOG IN
         </h1>
 
+        {% if form.non_field_errors %}
+            <div class="text-red-500 text-sm text-center mb-4">
+                {{ form.non_field_errors.0 }}
+            </div>
+        {% endif %}
+
         {% if messages %}
             <div class="mb-4">
                 {% for message in messages %}

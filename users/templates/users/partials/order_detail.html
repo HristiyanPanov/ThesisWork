@@ -1,3 +1,4 @@
+{% load custom_tags %}
 <div class="bg-white p-6 rounded-lg shadow-lg">
     <h2 class="text-xl font-semibold text-gray-900 mb-4 tracking-wide">
         ORDER #{{ order.id }}
@@ -20,16 +21,62 @@
         <h3 class="text-lg font-semibold text-gray-900 mt-4">Items</h3>
         <div class="space-y-2">
             {% for item in order.items.all %}
-                <div class="flex items-center justify-between border-b border-gray-200 pb-2">
-                    <div>
-                        <p class="text-sm text-gray-700">{{ item.product.name }} - {{ item.size.size.name }}</p>
-                        <p class="text-sm text-gray-600">Quantity: {{ item.quantity }}</p>
-                    </div>
-                    <p class="text-sm text-gray-700">€{{ item.get_total_price|floatformat:2 }}</p>
+            <div class="flex flex-col sm:flex-row gap-4 border-b border-gray-200 py-4">
+                
+                <!-- Image -->
+                <div class="w-28 h-28 bg-gray-100 flex-shrink-0 overflow-hidden">
+                {% if item.product.main_image %}
+                    <img src="{{ item.product.main_image.url }}" alt="{{ item.product.name }}" class="w-full h-full object-cover">
+                {% else %}
+                    <div class="w-full h-full flex items-center justify-center text-gray-400">No Image</div>
+                {% endif %}
                 </div>
+
+                <!-- Details -->
+                <div class="flex-1 flex flex-col justify-between">
+                <div>
+                {% with review=user_reviews_by_product|get_item:item.product.id %}
+                {% if review %}
+                    <div class="flex items-center gap-1 mt-1">
+                    <div class="flex text-yellow-400 text-sm">
+                        {% for i in "12345"|slice:":review.rating"|make_list %}★{% endfor %}
+                    </div>
+                    <span class="text-xs text-gray-500">({{ review.rating }}/5)</span>
+                    </div>
+                {% endif %}
+                {% endwith %}
+                    <a href="{% url 'main:product_detail' item.product.slug %}" 
+                        hx-get="{% url 'main:product_detail' item.product.slug %}" 
+                        hx-target="#main-content" 
+                        hx-push-url="true"
+                        class="text-sm font-semibold text-gray-900 hover:underline">
+                        {{ item.product.name }}
+                    </a>
+                    <p class="text-sm text-gray-600">Size: {{ item.size.size.name }}</p>
+                    <p class="text-sm text-gray-600 mt-1">€{{ item.price|floatformat:2 }}</p>
+                    <p class="text-sm text-gray-800 font-semibold">Quantity: {{ item.quantity }}</p>
+                </div>
+
+                <div class="flex justify-between items-center mt-2">
+                    <!-- Възможен track линк или празно място -->
+                    <div class="text-sm text-gray-400 italic"> </div>
+                    
+                    <!-- Leave a review -->
+                    {% if item.product.id not in reviewed_product_ids %}
+                    <a href="#" class="text-sm font-semibold hover:underline review-btn" data-product-id="{{ item.product.id }}">
+                        Leave a review
+                    </a>
+                    {% else %}
+                    <span class="text-sm text-gray-400 italic">Already reviewed</span>
+                    {% endif %}
+                </div>
+                </div>
+
+            </div>
             {% endfor %}
+
         </div>
-        
+
         <button 
             hx-get="{% url 'users:order_history' %}" 
             hx-target="#profile-main-content" 
@@ -40,3 +87,120 @@
         </button>
     </div>
 </div>
+
+
+<div id="reviewModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+  <div class="bg-white rounded-2xl shadow-xl p-6 w-full max-w-xl relative">
+    <button id="closeReviewModal" class="absolute top-2 right-2 text-gray-500 hover:text-black text-xl">&times;</button>
+    <h2 class="text-lg font-bold mb-4">Leave a Review</h2>
+    <form id="reviewForm">
+      {% csrf_token %}
+      <input type="hidden" name="product_id" id="reviewProductId">
+
+      <label class="block font-medium">Rating:</label>
+      <!-- Скрита стойност за rating -->
+        <input type="hidden" name="rating" id="rating-input" value="0">
+
+        <div id="star-rating" class="flex gap-1 text-2xl text-gray-300 cursor-pointer mb-4">
+        <span class="star" data-value="1">&#9733;</span>
+        <span class="star" data-value="2">&#9733;</span>
+        <span class="star" data-value="3">&#9733;</span>
+        <span class="star" data-value="4">&#9733;</span>
+        <span class="star" data-value="5">&#9733;</span>
+        </div>
+
+      <label class="block font-medium">Title:</label>
+      <input type="text" name="title" class="border rounded w-full p-2 mb-3" maxlength="50">
+
+      <label class="block font-medium">Review:</label>
+      <textarea name="content" class="border rounded w-full p-2 mb-3" rows="4" required></textarea>
+
+      <button type="submit" class="bg-black text-white px-4 py-2 rounded hover:bg-gray-900">
+        SUBMIT REVIEW
+      </button>
+    </form>
+  </div>
+</div>
+
+
+
+<script>
+function initStarRating() {
+  const stars = document.querySelectorAll("#star-rating .star");
+  const ratingInput = document.getElementById("rating-input");
+
+  if (!stars.length || !ratingInput) return;
+
+  stars.forEach(star => {
+    star.addEventListener("mouseenter", () => {
+      highlightStars(star.dataset.value);
+    });
+
+    star.addEventListener("mouseleave", () => {
+      highlightStars(ratingInput.value);
+    });
+
+    star.addEventListener("click", () => {
+      ratingInput.value = star.dataset.value;
+      highlightStars(star.dataset.value);
+    });
+  });
+
+  function highlightStars(value) {
+    stars.forEach(star => {
+      if (star.dataset.value <= value) {
+        star.classList.add("text-yellow-400");
+        star.classList.remove("text-gray-300");
+      } else {
+        star.classList.remove("text-yellow-400");
+        star.classList.add("text-gray-300");
+      }
+    });
+  }
+
+  // инициализира звезди при зареждане на модала
+  highlightStars(ratingInput.value || 0);
+}
+
+// Отваряне на модала
+document.querySelectorAll('.review-btn').forEach(btn => {
+  btn.addEventListener('click', function(e) {
+    e.preventDefault();
+    document.getElementById('reviewProductId').value = this.dataset.productId;
+    document.getElementById('reviewModal').classList.remove('hidden');
+    initStarRating();  // 🟢 това е ключово
+  });
+});
+
+// Затваряне на модала
+document.getElementById('closeReviewModal').addEventListener('click', function() {
+  document.getElementById('reviewModal').classList.add('hidden');
+});
+
+// Изпращане на ревю
+document.getElementById('reviewForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+  const productId = document.getElementById('reviewProductId').value;
+  const formData = new FormData(this);
+
+  fetch(`/submit-review/${productId}/`, {
+    method: 'POST',
+    headers: {
+      'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+    },
+    body: formData
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.success) {
+      alert(data.success);
+      document.getElementById('reviewModal').classList.add('hidden');
+      this.reset();
+    } else if (data.errors) {
+      alert("Validation errors:\n" + JSON.stringify(data.errors));
+    } else if (data.error) {
+      alert("Error: " + data.error);
+    }
+  });
+});
+</script>

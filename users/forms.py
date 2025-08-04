@@ -57,7 +57,7 @@ class CustomUserLoginForm(AuthenticationForm):
         if email and password:
             self.user_cache = authenticate(self.request, email=email, password=password)
             if self.user_cache is None:
-                raise forms.ValidationError('Invalid email or password.')
+                raise forms.ValidationError('Invalid Email or Password.')
             elif not self.user_cache.is_active:
                 raise forms.ValidationError('This account is inactive.')
         return self.cleaned_data

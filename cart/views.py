@@ -91,10 +91,8 @@ class AddToCartView(CartMixin, View):
         request.session['cart_id'] = cart.id
         request.session.modified = True
 
-        if request.headers.get('HX-Request'):
-            return redirect('cart:cart_modal')
-        else:
-            return JsonResponse({
+        
+        return JsonResponse({
                 'success': True,
                 'total_items': cart.total_items,
                 'message': f"{product.name} added to cart",

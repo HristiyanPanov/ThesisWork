@@ -1,10 +1,14 @@
 from django.shortcuts import get_object_or_404
 from django.views.generic import TemplateView, DetailView
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.template.response import TemplateResponse
-from .models import Category, Product, Size
+from .models import Category, Product, Size, ProductReview
 from django.db.models import Q
 from wishlist.forms import AddToWishlistForm
+from orders.models import OrderItem
+from .forms import ProductReviewForm
+from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.decorators import login_required
 
 
 class IndexView(TemplateView):
@@ -109,6 +113,8 @@ class ProductDetailView(DetailView):
         ).exclude(id=product.id)[:4]
         context['current_category'] = product.category.slug
         context['wishlist_form'] = AddToWishlistForm(product=product, user=self.request.user)
+        context['reviews'] = product.reviews.all().order_by('-created_at')
+
 
         return context
     
@@ -119,3 +125,24 @@ class ProductDetailView(DetailView):
         if request.headers.get('HX-Request'):
             return TemplateResponse(request, 'main/product_detail.html', context)
         return TemplateResponse(request, self.template_name, context)
+    
+@login_required
+@csrf_exempt
+def submit_review(request, product_id):
+    if request.method == 'POST':
+        product = get_object_or_404(Product, id=product_id)
+
+        # Проверка: потребителят е купувал този продукт
+        if not OrderItem.objects.filter(order__user=request.user, product=product).exists():
+            return JsonResponse({'error': 'You can only review products you have purchased.'}, status=403)
+
+        form = ProductReviewForm(request.POST)
+        if form.is_valid():
+            review = form.save(commit=False)
+            review.product = product
+            review.user = request.user
+            review.save()
+            return JsonResponse({'success': 'Review submitted successfully.'})
+        else:
+            return JsonResponse({'errors': form.errors}, status=400)
+        

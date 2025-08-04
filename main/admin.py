@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Category, Size, Product, ProductImage, ProductSize
+from .models import Category, Size, Product, ProductImage, ProductSize, ProductReview
 
 class ProductImageInline(admin.TabularInline):
     model = ProductImage
@@ -28,7 +28,13 @@ class SizeAdmin(admin.ModelAdmin):
     list_display = ['name']
 
 
+class ProductReviewAdmin(admin.ModelAdmin):
+    list_display = ('product', 'user', 'rating', 'title', 'created_at')
+    search_fields = ('product__name', 'user__email', 'title', 'content')
+    list_filter = ('rating', 'created_at')
+
 
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(Size, SizeAdmin)
 admin.site.register(Product, ProductAdmin)
+admin.site.register(ProductReview, ProductReviewAdmin)
