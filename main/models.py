@@ -6,16 +6,19 @@ from django.conf import settings
 class Category(models.Model):
     name = models.CharField(max_length=100)
     slug = models.CharField(max_length=100, unique=True)
+    parent = models.ForeignKey('self', null=True, blank=True, related_name='subcategories', on_delete=models.CASCADE)
 
-
-    def save(self,  *args, **kwargs):
+    def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = slugify(self.name)
         super().save(*args, **kwargs)
 
-
     def __str__(self):
         return self.name
+
+    def is_top_level(self):
+        return self.parent is None
+
 
 
 class Size(models.Model):
@@ -77,3 +80,34 @@ class ProductReview(models.Model):
     def __str__(self):
         return f"{self.product.name} - {self.rating} stars by {self.user}"
     
+
+class Outfit(models.Model):
+    GENDER_CHOICES = [
+        ('male', 'Male'),
+        ('female', 'Female'),
+    ]
+
+    title = models.CharField(max_length=100)
+    gender = models.CharField(max_length=10, choices=GENDER_CHOICES)
+    image = models.ImageField(upload_to='outfits/')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.title
+    
+
+class OutfitImage(models.Model):
+    outfit = models.ForeignKey(Outfit, related_name='images', on_delete=models.CASCADE)
+    image = models.ImageField(upload_to='outfits/extra/')
+
+    def __str__(self):
+        return f"Image for {self.outfit.title}"
+
+
+
+class OutfitItem(models.Model):
+    outfit = models.ForeignKey(Outfit, related_name='items', on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.outfit.title} - {self.product.name}"

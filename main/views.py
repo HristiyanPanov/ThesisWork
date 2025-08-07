@@ -1,27 +1,35 @@
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, render
 from django.views.generic import TemplateView, DetailView
 from django.http import HttpResponse, JsonResponse
 from django.template.response import TemplateResponse
-from .models import Category, Product, Size, ProductReview
+from .models import Category, Product, Size, ProductReview, Outfit, ProductSize
 from django.db.models import Q
 from wishlist.forms import AddToWishlistForm
 from orders.models import OrderItem
 from .forms import ProductReviewForm
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_GET, require_POST
+from cart.models import Cart, CartItem
+import json
 
 
 class IndexView(TemplateView):
     template_name = 'main/base.html'
 
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['categories'] = Category.objects.all()
+        context['categories'] = Category.objects.filter(parent__isnull=True).prefetch_related('subcategories')
         context['current_category'] = None
-        return context
-    
 
+        # Само outfit-и
+        context['male_outfits'] = Outfit.objects.filter(gender='male').order_by('-created_at')[:3]
+        context['female_outfits'] = Outfit.objects.filter(gender='female').order_by('-created_at')[:3]
+
+        return context
+
+
+    
     def get(self, request, *args, **kwargs):
         context = self.get_context_data(**kwargs)
         if request.headers.get('HX-Request'):
@@ -43,7 +51,7 @@ class CatalogView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         category_slug = kwargs.get('category_slug')
-        categories = Category.objects.all()
+        categories = Category.objects.filter(parent__isnull=True).prefetch_related('subcategories')
         products = Product.objects.all().order_by('-created_at')
         current_category = None
 
@@ -107,7 +115,7 @@ class ProductDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         product = self.get_object()
-        context['categories'] = Category.objects.all()
+        context['categories'] = Category.objects.filter(parent__isnull=True).prefetch_related('subcategories')
         context['related_products'] = Product.objects.filter(
             category=product.category
         ).exclude(id=product.id)[:4]
@@ -145,4 +153,72 @@ def submit_review(request, product_id):
             return JsonResponse({'success': 'Review submitted successfully.'})
         else:
             return JsonResponse({'errors': form.errors}, status=400)
+        
+
+@require_GET
+def get_outfit_modal(request, outfit_id):
+    outfit = get_object_or_404(Outfit, id=outfit_id)
+    items = outfit.items.select_related('product')
+
+    product_data = []
+    for item in items:
+        product = item.product
+        sizes = ProductSize.objects.filter(product=product).select_related('size')
+        product_data.append({
+            'product': product,
+            'sizes': sizes
+        })
+
+    return render(request, 'main/get_the_look_modal.html', {
+        'outfit': outfit,
+        'product_data': product_data
+    })
+
+
+@require_POST
+def add_outfit_to_cart(request):
+    added_count = 0  # ✅ започваме с 0
+
+    try:
+        data = json.loads(request.body)
+        products = data.get('products', [])
+
+        if not products:
+            return JsonResponse({'error': 'No products provided'}, status=400)
+
+        session_key = request.session.session_key
+        if not session_key:
+            request.session.create()
+            session_key = request.session.session_key
+
+        cart, _ = Cart.objects.get_or_create(session_key=session_key)
+
+        for item in products:
+            product_id = item.get('product_id')
+            size_id = item.get('size_id')
+
+            if not product_id or not size_id:
+                continue
+
+            # Вземаме продукта и размера
+            product = Product.objects.get(id=product_id)
+            product_size = ProductSize.objects.get(product=product, size_id=size_id)
+
+            # Използваме вградения метод на Cart
+            cart.add_product(product, product_size, quantity=1)
+
+            added_count += 1  # ✅ увеличаваме брояча
+
+        return JsonResponse({
+            'success': True,
+            'cart_count': cart.total_items,
+            'added_count': added_count  # ✅ връщаме колко артикула са добавени
+        })
+
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return JsonResponse({'error': str(e)}, status=500)
+
+
         

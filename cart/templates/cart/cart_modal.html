@@ -87,6 +87,24 @@
         }
     }
 
+    function handleCheckoutClick(event, link) {
+        event.preventDefault();
+
+        if (typeof closeCart === 'function') {
+            closeCart();
+            setTimeout(() => {
+                htmx.ajax('GET', link.href, {
+                    target: '#main-content',
+                    swap: 'innerHTML',
+                    pushUrl: true
+                });
+            }, 300);
+        } else {
+            console.warn('closeCart not defined, fallback to direct nav');
+            window.location.href = link.href;
+        }
+    }
+
     // Trigger open animation when modal is loaded via HTMX
     document.addEventListener('htmx:afterSwap', function(evt) {
         console.log('HTMX afterSwap event triggered', evt.detail.elt.id);

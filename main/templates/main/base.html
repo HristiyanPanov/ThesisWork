@@ -134,6 +134,31 @@
             color: #6b7280;
             font-weight: 500;
         }
+
+        /* Dropdown подменю */
+        .group:hover .group-hover\:opacity-100 {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .dropdown-menu {
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.2s ease-in-out;
+        }
+
+        /*Анимация при скрол*/
+        .animate-fade-in {
+        opacity: 0;
+        transform: translateY(20px);
+        transition: all 0.6s ease-out;
+        }
+        .animate-fade-in.visible {
+        opacity: 1;
+        transform: translateY(0);
+        }
+
+
     </style>
 </head>
 <body class="bg-white">
@@ -155,23 +180,37 @@
                 </button>
             </div>
             
-            <nav class="space-y-6">
-                <a href="{% url 'main:index' %}" 
-                   hx-get="{% url 'main:index' %}" 
-                   hx-target="#main-content" 
-                   hx-push-url="true"
-                   class="mobile-nav-link block text-lg font-medium text-gray-900 hover:text-gray-700 py-2 border-b border-gray-200">
-                   HOME
-                </a>
-                {% for category in categories %}
-                <a href="{% url 'main:catalog' category.slug %}" 
-                   hx-get="{% url 'main:catalog' category.slug %}" 
-                   hx-target="#main-content" 
-                   hx-push-url="true"
-                   class="mobile-nav-link block text-lg font-medium text-gray-900 hover:text-gray-700 py-2 border-b border-gray-200 {% if current_category == category.slug %}active{% endif %}">
-                   {{ category.name|upper }}
-                </a>
-                {% endfor %}
+            <nav class="space-y-4">
+            <a href="{% url 'main:index' %}" 
+                hx-get="{% url 'main:index' %}" 
+                hx-target="#main-content" 
+                hx-push-url="true"
+                class="mobile-nav-link block text-lg font-medium text-gray-900 hover:text-gray-700 py-2 border-b border-gray-200">
+                HOME
+            </a>
+
+            {% for parent in categories %}
+                <div>
+                <button type="button"
+                        data-target="subcat-{{ parent.slug }}"
+                        class="mobile-category-toggle w-full text-left text-lg font-medium text-gray-900 flex justify-between items-center py-2 border-b border-gray-200">
+                    {{ parent.name|upper }}
+                    <span class="text-xl">+</span>
+                </button>
+
+                <div id="subcat-{{ parent.slug }}" class="ml-4 mt-2 space-y-1 hidden">
+                    {% for subcat in parent.subcategories.all %}
+                    <a href="{% url 'main:catalog' subcat.slug %}"
+                        hx-get="{% url 'main:catalog' subcat.slug %}"
+                        hx-target="#main-content"
+                        hx-push-url="true"
+                        class="block text-sm text-gray-800 hover:text-black">
+                        {{ subcat.name }}
+                    </a>
+                    {% endfor %}
+                </div>
+                </div>
+            {% endfor %}
             </nav>
             
             <div class="mt-8 space-y-4">
@@ -214,14 +253,30 @@
                 
                 <!-- Desktop Navigation -->
                 <nav class="hidden md:flex space-x-8">
-                    {% for category in categories %}
-                    <a href="{% url 'main:catalog' category.slug %}" 
-                       hx-get="{% url 'main:catalog' category.slug %}" 
-                       hx-target="#main-content" 
-                       hx-push-url="true"
-                       class="nav-link text-sm font-medium text-gray-900 hover:text-gray-700 {% if current_category == category.slug %}active{% endif %}">
-                       {{ category.name|upper }}
-                    </a>
+                    {% for parent in categories %}
+                    <div class="relative group">
+                        <button class="nav-link text-sm font-medium text-gray-900 hover:text-gray-700">
+                            {{ parent.name|upper }}
+                        </button>
+
+                        {% if parent.subcategories.all %}
+                        <div class="absolute left-0 mt-2 w-40 bg-white shadow-lg opacity-0 group-hover:opacity-100 transition duration-200 z-50">
+                            <ul class="py-2">
+                                {% for subcat in parent.subcategories.all %}
+                                <li>
+                                    <a href="{% url 'main:catalog' subcat.slug %}"
+                                    hx-get="{% url 'main:catalog' subcat.slug %}"
+                                    hx-target="#main-content"
+                                    hx-push-url="true"
+                                    class="block px-4 py-2 text-sm text-gray-800 hover:bg-gray-100">
+                                        {{ subcat.name }}
+                                    </a>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        {% endif %}
+                    </div>
                     {% endfor %}
                 </nav>
                 
@@ -257,6 +312,7 @@
         </div>
     </header>
     <div id="cart-container"></div>
+
     <!-- Mounts for dynamic wishlist content -->
     <div id="wishlist-container"></div>
 
@@ -272,31 +328,10 @@
     <!-- Main Content -->
     <div id="main-content">
         {% block content %}
-        <!-- Default home content -->
-        <main class="mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <div class="text-center py-20">
-                <h2 class="text-4xl font-bold tracking-tight text-gray-900 mb-4">
-                    ENFANTS RICHES DÉPRIMÉS
-                </h2>
-                <p class="text-lg text-gray-600 mb-8">
-                    Select a category to browse our collection
-                </p>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl mx-auto">
-                    {% for category in categories %}
-                    <a href="{% url 'main:catalog' category.slug %}" 
-                       hx-get="{% url 'main:catalog' category.slug %}" 
-                       hx-target="#main-content" 
-                       hx-push-url="true"
-                       class="block p-8 border border-gray-200 hover:border-gray-300 transition-colors">
-                        <h3 class="text-xl font-bold">{{ category.name|upper }}</h3>
-                    </a>
-
-                    {% endfor %}    
-                </div>
-            </div>
-        </main>
+            {% include 'main/home_content.html' %}
         {% endblock %}
     </div>
+
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -328,8 +363,32 @@
             document.addEventListener('htmx:afterRequest', function() {
                 closeMobileMenu();
             });
-    
-        
+
+            // 🆕 Accordion toggles for mobile categories
+            const toggles = document.querySelectorAll('.mobile-category-toggle');
+
+            toggles.forEach(toggle => {
+                toggle.addEventListener('click', function () {
+                    const targetId = this.dataset.target;
+                    const target = document.getElementById(targetId);
+
+                    if (target) {
+                        target.classList.toggle('hidden');
+                    }
+                });
+            });
+
+            //Js за Анимация
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+                });
+            });
+
+            document.querySelectorAll('.animate-fade-in').forEach(el => observer.observe(el));
+
             // Cart functionality
             const desktopCart = document.getElementById('desktopCart');
             const mobileCart = document.getElementById('mobileCart');
@@ -362,12 +421,14 @@
                     });
             }
 
+            
             function openCart() {
                 htmx.ajax('GET', '{% url "cart:cart_modal" %}', {
                     target: '#cart-container',
                     swap: 'innerHTML'
                 });
             }
+
     
             [desktopCart, mobileCart, mobileCartHeader].forEach(cartLink => {
                 if (cartLink) {

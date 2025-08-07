@@ -1,22 +1,412 @@
-<!-- Home content for HTMX requests -->
-<main class="mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <div class="text-center py-20">
-        <h2 class="text-4xl font-bold tracking-tight text-gray-900 mb-4">
-            ENFANTS RICHES DÉPRIMÉS
-        </h2>
-        <p class="text-lg text-gray-600 mb-8">
-            Select a category to browse our collection
-        </p>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl mx-auto">
-            {% for category in categories %}
-            <a href="{% url 'main:catalog' category.slug %}" 
-               hx-get="{% url 'main:catalog' category.slug %}" 
-               hx-target="#main-content" 
-               hx-push-url="true"
-               class="block p-8 border border-gray-200 hover:border-gray-300 transition-colors">
-                <h3 class="text-xl font-bold">{{ category.name|upper }}</h3>
-            </a>
+<div class="outfit-wrapper">
+
+    <!-- FOR HER -->
+    <section class="outfit-section">
+        <h2 class="outfit-title">FOR HER</h2>
+        <div class="outfit-grid">
+            {% for outfit in female_outfits %}
+                <div class="outfit-card">
+                    <div class="outfit-image-wrapper">
+                        <img src="{{ outfit.image.url }}" alt="{{ outfit.title }}" class="outfit-image">
+                        <button class="get-look-btn" data-outfit-id="{{ outfit.id }}">GET THE LOOK</button>
+                    </div>
+                </div>
             {% endfor %}
         </div>
-    </div>
-</main>
+    </section>
+
+    <!-- FOR HIM -->
+    <section class="outfit-section">
+        <h2 class="outfit-title">FOR HIM</h2>
+        <div class="outfit-grid">
+            {% for outfit in male_outfits %}
+                <div class="outfit-card">
+                    <div class="outfit-image-wrapper">
+                        <img src="{{ outfit.image.url }}" alt="{{ outfit.title }}" class="outfit-image">
+                        <button class="get-look-btn" data-outfit-id="{{ outfit.id }}">GET THE LOOK</button>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </section>
+
+</div>
+
+<!-- MODAL -->
+<div id="get-look-modal" class="modal" style="display: none;">
+  <div id="modal-overlay" class="modal-overlay"></div>
+  <div class="modal-content" id="modal-content" hx-boost="true" hx-target="#main-content">
+    <!-- AJAX content -->
+    <button class="modal-close-btn" id="modal-close">×</button>
+  </div>
+</div>
+
+
+
+<style>
+    .outfit-wrapper {
+        max-width: 1440px;
+        margin: 0 auto;
+        padding: 40px 20px;
+    }
+
+    .outfit-title {
+        font-size: 26px;
+        font-weight: 600;
+        margin-bottom: 20px;
+        text-transform: uppercase;
+    }
+
+    .outfit-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 32px;
+        margin-bottom: 60px;
+        justify-content: flex-start;
+    }
+
+    .outfit-card {
+        width: 440px;
+        height: 550px;
+        border-radius: 16px;
+        overflow: hidden;
+        position: relative;
+        background: #f8f8f8;
+    }
+
+    .outfit-image-wrapper {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        border-radius: 16px;
+        overflow: hidden;
+    }
+
+    .outfit-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 16px;
+        display: block;
+    }
+
+    .get-look-btn {
+        position: absolute;
+        bottom: 20px;
+        left: 20px;
+        padding: 10px 20px;
+        background-color: white;
+        color: black;
+        border: none;
+        border-radius: 30px;
+        font-weight: 600;
+        cursor: pointer;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+        transition: all 0.3s ease;
+    }
+
+    .get-look-btn:hover {
+        background-color: black;
+        color: white;
+    }
+
+    /* Modal */
+    .modal {
+        position: fixed;
+        top: 0; left: 0;
+        width: 100vw; height: 100vh;
+        background-color: rgba(0,0,0,0.6);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+    }
+
+    .modal-content {
+        background: white;
+        padding: 2rem;
+        border-radius: 12px;
+        max-height: 90vh;
+        overflow-y: auto;
+        width: 90%;
+        max-width: 600px;
+        position: relative;
+    }
+
+    .modal-close-btn {
+        position: absolute;
+        top: 10px;
+        right: 15px;
+        background: none;
+        border: none;
+        font-size: 2rem;
+        cursor: pointer;
+    }
+
+    @media screen and (max-width: 768px) {
+        .outfit-grid {
+            justify-content: center;
+        }
+
+        .outfit-card {
+            width: 100%;
+            max-width: 360px;
+            height: auto;
+        }
+    }
+
+    .add-to-cart-btn {
+      width: 100%;
+      padding: 12px;
+      background: #eee;
+      color: #999;
+      font-weight: 600;
+      border-radius: 30px;
+      border: none;
+      cursor: not-allowed;
+      margin-top: 20px;
+      transition: all 0.3s ease;
+    }
+
+    .add-to-cart-btn.active {
+      background: #000;
+      color: #fff;
+      cursor: pointer;
+    }
+
+    .add-to-cart-btn.active:hover {
+      background: #222;
+    }
+
+    /* Анимация при затваряне */
+    .modal.fade-out {
+      animation: fadeOutModal 0.3s ease forwards;
+    }
+
+    @keyframes fadeOutModal {
+      0% {
+        opacity: 1;
+        transform: scale(1);
+      }
+      100% {
+        opacity: 0;
+        transform: scale(0.95);
+      }
+    }
+
+    /* Анимация при отваряне */
+    .modal.fade-in {
+      animation: fadeInModal 0.3s ease forwards;
+    }
+
+    @keyframes fadeInModal {
+      0% {
+        opacity: 0;
+        transform: scale(0.95);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.6); /* директно крайният цвят */
+      z-index: 0;
+    }
+
+</style>
+
+
+
+<script>
+  function closeModal() {
+    const modal = document.getElementById('get-look-modal');
+    const modalContent = document.getElementById('modal-content');
+
+    modal.classList.add('fade-out');
+
+    setTimeout(() => {
+      modal.style.display = 'none';
+      modal.classList.remove('fade-out');
+      modalContent.innerHTML = '';
+    }, 300); // Съответства на .3s от CSS анимацията
+  }
+
+  function attachGetTheLookHandlers() {
+    const buttons = document.querySelectorAll('.get-look-btn');
+    const modal = document.getElementById('get-look-modal');
+    const modalContent = document.getElementById('modal-content');
+
+    buttons.forEach(button => {
+      button.addEventListener('click', () => {
+        const outfitId = button.dataset.outfitId;
+
+        fetch(`/get-look/${outfitId}/`)
+          .then(res => res.text())
+          .then(html => {
+            modalContent.innerHTML = html;
+            modal.classList.remove('fade-out');
+            modal.classList.add('fade-in');
+            modal.style.display = 'flex';
+
+            setTimeout(() => {
+              modal.classList.remove('fade-in');
+            }, 300); // премахва класа след като анимацията завърши
+
+            const closeBtn = document.getElementById('modal-close');
+            if (closeBtn) {
+              closeBtn.addEventListener('click', closeModal);
+            }
+
+            const addToCartBtn = document.getElementById('add-to-cart-btn');
+            const sizeSelects = document.querySelectorAll('.product-size-select');
+
+            function updateAddButton() {
+              let selectedCount = 0;
+
+              sizeSelects.forEach(select => {
+                if (select.value !== "") {
+                  selectedCount++;
+                }
+              });
+
+              if (selectedCount === 0) {
+                addToCartBtn.disabled = true;
+                addToCartBtn.classList.remove('active');
+                addToCartBtn.textContent = 'ADD TO CART';
+              } else {
+                addToCartBtn.disabled = false;
+                addToCartBtn.classList.add('active');
+                addToCartBtn.textContent = `ADD ${selectedCount} ITEM${selectedCount > 1 ? 'S' : ''} TO CART`;
+              }
+            }
+
+            sizeSelects.forEach(select => {
+              select.addEventListener('change', updateAddButton);
+            });
+
+            updateAddButton();
+
+            addToCartBtn.addEventListener('click', () => {
+              const selectedItems = [];
+
+              sizeSelects.forEach(select => {
+                const sizeId = select.value;
+                const productId = select.dataset.productId;
+
+                if (sizeId) {
+                  selectedItems.push({
+                    product_id: productId,
+                    size_id: sizeId
+                  });
+                }
+              });
+
+              fetch('/add-outfit-to-cart/', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify({ products: selectedItems })
+              })
+                .then(response => response.json())
+                .then(data => {
+                  if (data.success) {
+                    closeModal();
+
+                    htmx.ajax('GET', '/cart/', {
+                      target: '#cart-container',
+                      swap: 'innerHTML'
+                    });
+
+                    updateHeaderCartCount(data.cart_count);
+
+                    showNotification(`${data.added_count} item${data.added_count > 1 ? 's' : ''} added to cart`);
+                  } else {
+                    alert(data.error || 'Something went wrong.');
+                  }
+                });
+            });
+          });
+      });
+    });
+
+    if (modal) {
+      modal.addEventListener('click', function (event) {
+        if (event.target === modal) {
+          closeModal();
+        }
+      });
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', attachGetTheLookHandlers);
+
+  document.addEventListener('htmx:afterSwap', function (e) {
+    if (e.detail.target.id === 'main-content') {
+      attachGetTheLookHandlers();
+    }
+  });
+
+  document.addEventListener('htmx:beforeRequest', function () {
+    closeModal();
+  });
+
+
+
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+      const cookies = document.cookie.split(';');
+      for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        if (cookie.startsWith(name + '=')) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  }
+
+  function navigateToProduct(slug) {
+    closeModal(); // затвори модала
+
+    // След кратко забавяне – навигирай към продукта
+    setTimeout(() => {
+      htmx.ajax('GET', `/product/${slug}/`, {
+        target: '#main-content',
+        pushUrl: true,
+        swap: 'innerHTML'
+      });
+    }, 300); // чакаме малко, за да не се сблъска със затваряне на модала
+  }
+
+  // Клик по overlay да затваря модала
+  document.addEventListener('click', function (e) {
+    const modal = document.getElementById('get-look-modal');
+    const modalContent = document.getElementById('modal-content');
+
+    if (!modal || !modalContent) return;
+
+    // Ако модалът не е видим – нищо не правим
+    if (modal.style.display === 'none') return;
+
+    // Ако кликнатият елемент е извън съдържанието
+    if (modal.contains(e.target) && !modalContent.contains(e.target)) {
+      closeModal();
+    }
+  });
+
+</script>
+
+
+
+
+

@@ -1,4 +1,4 @@
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import get_object_or_404, redirect, render
 from django.views.generic import View
 from django.http import JsonResponse, HttpResponse
 from django.template.response import TemplateResponse
@@ -8,6 +8,7 @@ from main.models import Product, ProductSize
 from .models import Cart, CartItem
 from .forms import AddToCartForm
 import json
+from django.utils.html import escape
 
 
 class CartMixin:
@@ -196,3 +197,10 @@ class CartSummaryView(CartMixin, View):
             ).order_by('-added_at')
         }
         return TemplateResponse(request, 'cart/cart_summary.html', context)
+    
+
+def cart_notification(request):
+    message = request.GET.get('msg', 'Items added to bag')
+    return render(request, 'cart/cart_notification.html', {
+        'message': escape(message)
+    })

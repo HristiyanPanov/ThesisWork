@@ -1,5 +1,6 @@
 from django.urls import path 
 from . import views
+from cart.views import cart_notification
 
 app_name = 'cart'
 
@@ -11,4 +12,5 @@ urlpatterns = [
     path('count/', views.CartCountView.as_view(), name='cart_count'),
     path('clear/', views.ClearCartView.as_view(), name='clear_cart'),
     path('summary', views.CartSummaryView.as_view(), name='cart_summary'),
+    path('notification/', cart_notification, name='cart_notification')
 ]
