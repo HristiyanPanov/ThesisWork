@@ -13,3 +13,7 @@ class ProductReviewForm(forms.ModelForm):
             'title': forms.TextInput(attrs={'placeholder': 'Summary of your review'}),
             'content': forms.Textarea(attrs={'placeholder': 'Write your review...'}),
         }
+
+
+class NewsletterForm(forms.Form):
+    email = forms.EmailField(label='Email')

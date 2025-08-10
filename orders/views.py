@@ -2,18 +2,21 @@ from django.conf import settings
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.template.response import TemplateResponse
 from django.views.generic import View
 from .forms import OrderForm
 from .models import Order, OrderItem
 from cart.views import CartMixin
 from cart.models import Cart
-from main.models import ProductSize
+from main.models import ProductSize, NewsletterSubscriber
 from django.shortcuts import get_object_or_404
 from payment.views import create_stripe_checkout_session
 from decimal import Decimal
 import logging
+from django.views.decorators.csrf import csrf_exempt
+import json
+
 
 logger = logging.getLogger(__name__)
 
@@ -71,7 +74,21 @@ class CheckoutView(CartMixin, View):
                 return TemplateResponse(request, 'orders/checkout_content.html', context)
             return render(request, 'orders/checkout.html', context)
         
-        total_price = cart.subtotal
+        # Изчисляване на subtotal и отстъпка
+        subtotal = cart.subtotal
+        discount_code = request.POST.get('discount_code', '').strip()
+        discount_percent = 0
+
+        if discount_code:
+            try:
+                subscriber = NewsletterSubscriber.objects.get(discount_code=discount_code)
+                discount_percent = 10
+            except NewsletterSubscriber.DoesNotExist:
+                discount_percent = 0
+
+        discount_value = subtotal * (Decimal(discount_percent) / Decimal('100'))
+        total_price = subtotal - discount_value
+
         form_data = request.POST.copy()
         if not form_data.get('email'):
             form_data['email'] = request.user.email
@@ -94,6 +111,7 @@ class CheckoutView(CartMixin, View):
                 special_instructions='',
                 total_price=total_price,
                 payment_provider=payment_provider,
+                discount=discount_value,
             )
 
             for item in cart.items.select_related('product', 'product_size'):
@@ -145,3 +163,22 @@ class CheckoutView(CartMixin, View):
             if request.headers.get('HX-Request'):
                 return TemplateResponse(request, 'orders/checkout_content.html', context)
             return render(request, 'orders/checkout.html', context)
+        
+
+@csrf_exempt
+def validate_discount_code(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            code = data.get('code', '').strip()
+            subtotal = float(data.get('subtotal', 0))
+
+            subscriber = NewsletterSubscriber.objects.get(discount_code=code)
+            discount_percent = 10
+            discount_value = round(subtotal * (discount_percent / 100), 2)
+
+            return JsonResponse({'valid': True, 'discount_value': discount_value})
+        except NewsletterSubscriber.DoesNotExist:
+            return JsonResponse({'valid': False})
+        except Exception as e:
+            return JsonResponse({'valid': False, 'error': str(e)})

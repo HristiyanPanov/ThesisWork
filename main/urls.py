@@ -12,5 +12,5 @@ urlpatterns = [
     path('submit-review/<int:product_id>/', views.submit_review, name='submit_review'),
     path('get-look/<int:outfit_id>/', get_outfit_modal, name='get_the_look_modal'),
     path('add-outfit-to-cart/', add_outfit_to_cart, name='add_outfit_to_cart'),
-
+    path('subscribe-newsletter/', views.subscribe_newsletter, name='subscribe_newsletter'),
 ]

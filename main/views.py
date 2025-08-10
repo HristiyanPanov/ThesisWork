@@ -2,16 +2,18 @@ from django.shortcuts import get_object_or_404, render
 from django.views.generic import TemplateView, DetailView
 from django.http import HttpResponse, JsonResponse
 from django.template.response import TemplateResponse
-from .models import Category, Product, Size, ProductReview, Outfit, ProductSize
+from .models import Category, Product, Size, ProductReview, Outfit, ProductSize, NewsletterSubscriber
 from django.db.models import Q
 from wishlist.forms import AddToWishlistForm
 from orders.models import OrderItem
-from .forms import ProductReviewForm
+from .forms import ProductReviewForm, NewsletterForm
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_GET, require_POST
 from cart.models import Cart, CartItem
 import json
+from django.core.mail import send_mail
+from django.conf import settings
 
 
 class IndexView(TemplateView):
@@ -219,6 +221,36 @@ def add_outfit_to_cart(request):
         import traceback
         traceback.print_exc()
         return JsonResponse({'error': str(e)}, status=500)
+    
+
+@require_POST
+def subscribe_newsletter(request):
+    form = NewsletterForm(request.POST)
+    if form.is_valid():
+        email = form.cleaned_data['email']
+        discount_code = "WELCOME10"
+
+        subscriber, created = NewsletterSubscriber.objects.get_or_create(email=email)
+
+        if created:
+            subscriber.discount_code = discount_code
+            subscriber.save()
+
+            send_mail(
+                'Вашият код за 10% отстъпка',
+                f'Благодарим ви, че се абонирахте! Ето вашият код: {discount_code}',
+                settings.DEFAULT_FROM_EMAIL,
+                [email],
+                fail_silently=False,
+            )
+
+            return JsonResponse({'success': True, 'new': True})
+        
+        # ⛔ Вече съществува
+        return JsonResponse({'success': True, 'new': False})
+
+    return JsonResponse({'success': False, 'errors': form.errors}, status=400)
+
 
 
         

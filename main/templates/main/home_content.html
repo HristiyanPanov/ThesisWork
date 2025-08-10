@@ -32,6 +32,21 @@
 
 </div>
 
+<div class="newsletter-section">
+  <h2 class="newsletter-title">-10% OFF WHEN YOU SUBSCRIBE TO OUR NEWSLETTER</h2>
+  <p class="newsletter-subtitle">
+    Enter your email and receive a discount code directly in your inbox
+  </p>
+
+  <form id="newsletter-form" class="newsletter-form">
+    <input type="email" name="email" placeholder="E-MAIL" required class="newsletter-input">
+    <button type="submit" class="newsletter-submit">Subscribe</button>
+  </form>
+
+  <div id="newsletter-message" class="newsletter-message"></div>
+</div>
+
+
 <!-- MODAL -->
 <div id="get-look-modal" class="modal" style="display: none;">
   <div id="modal-overlay" class="modal-overlay"></div>
@@ -219,6 +234,67 @@
       z-index: 0;
     }
 
+    .newsletter-section {
+      background-color: #f9f9f9;
+      padding: 40px 20px;
+      text-align: center;
+      margin-top: 60px;
+      border-radius: 12px;
+    }
+
+    .newsletter-title {
+      font-size: 22px;
+      font-weight: 600;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+    }
+
+    .newsletter-subtitle {
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 24px;
+    }
+
+    .newsletter-form {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+
+    .newsletter-input {
+      flex: 1;
+      padding: 10px 14px;
+      font-size: 14px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      min-width: 220px;
+    }
+
+    .newsletter-submit {
+      padding: 10px 20px;
+      background-color: black;
+      color: white;
+      border: none;
+      font-weight: 600;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .newsletter-submit:hover {
+      background-color: #222;
+    }
+
+    .newsletter-message {
+      margin-top: 16px;
+      font-size: 14px;
+    }
+
+
 </style>
 
 
@@ -402,6 +478,37 @@
     if (modal.contains(e.target) && !modalContent.contains(e.target)) {
       closeModal();
     }
+  });
+
+
+  document.getElementById('newsletter-form').addEventListener('submit', function (e) {
+    e.preventDefault();
+    const form = e.target;
+    const formData = new FormData(form);
+    const message = document.getElementById('newsletter-message');
+
+    fetch('/subscribe-newsletter/', {
+      method: 'POST',
+      headers: {
+        'X-CSRFToken': getCookie('csrftoken'),
+      },
+      body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        if (data.new) {
+          message.textContent = "✅ Successfully subscribed! Check your email for the code.";
+          message.style.color = "green";
+        } else {
+          message.textContent = "ℹ️ You are already subscribed. Check your inbox for the code.";
+          message.style.color = "#444";
+        }
+      } else {
+        message.textContent = "❌ Please enter a valid email.";
+        message.style.color = "red";
+      }
+    });
   });
 
 </script>

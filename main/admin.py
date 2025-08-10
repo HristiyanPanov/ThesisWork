@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Category, Size, Product, ProductImage, ProductSize, ProductReview, Outfit, OutfitItem, OutfitImage
+from .models import Category, Size, Product, ProductImage, ProductSize, ProductReview, Outfit, OutfitItem, OutfitImage, NewsletterSubscriber
 
 class ProductImageInline(admin.TabularInline):
     model = ProductImage
@@ -51,6 +51,13 @@ class OutfitAdmin(admin.ModelAdmin):
     list_display = ['title', 'gender', 'created_at']
     list_filter = ['gender']
     inlines = [OutfitItemInline, OutfitImageInline]
+
+
+@admin.register(NewsletterSubscriber)
+class NewsletterSubscriberAdmin(admin.ModelAdmin):
+    list_display = ('email', 'discount_code', 'date_subscribed')
+    search_fields = ('email',)
+    list_filter = ('date_subscribed',)
 
 
 admin.site.register(Category, CategoryAdmin)
