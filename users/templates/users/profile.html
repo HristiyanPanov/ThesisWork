@@ -37,36 +37,43 @@
         <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
             <!-- Sidebar -->
             <div class="col-span-1">
-                <div class="bg-white p-6 rounded-lg shadow-lg">
-                    <ul class="space-y-4">
-                        <li class="nav-item">
-                            <a href="{% url 'users:profile' %}" 
-                               hx-get="{% url 'users:profile' %}" 
-                               hx-target="#main-content" 
-                               hx-push-url="true"
-                               class="flex items-center text-gray-700 font-semibold text-sm tracking-wide hover:text-gray-900 {% if request.resolver_match.url_name == 'profile' %}text-gray-900 border-l-4 border-gray-500 pl-2{% endif %}">
-                                ACCOUNT
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{% url 'users:order_history' %}" 
-                               hx-get="{% url 'users:order_history' %}" 
-                               hx-target="#profile-main-content"  
-                               hx-push-url="true"
-                               class="flex items-center text-gray-700 font-semibold text-sm tracking-wide hover:text-gray-900 {% if request.resolver_match.url_name == 'order_history' %}text-gray-900 border-l-4 border-gray-500 pl-2{% endif %}">
-                                ORDER HISTORY
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{% url 'users:logout' %}" 
-                               hx-get="{% url 'users:logout' %}" 
-                               hx-target="#main-content" 
-                               hx-push-url="true"
-                               class="flex items-center text-gray-700 font-semibold text-sm tracking-wide hover:text-gray-900">
-                                LOG OUT
-                            </a>
-                        </li>
+                <div class="bg-white p-6 rounded-lg shadow-lg account-sidebar">
+                    <ul class="space-y-2">
+                    <!-- ACCOUNT -->
+                    <li class="nav-item">
+                        <a id="nav-account"
+                        href="{% url 'users:profile' %}"
+                        hx-get="{% url 'users:profile' %}"
+                        hx-target="#main-content"
+                        hx-push-url="true"
+                        class="nav-link flex items-center text-gray-700 font-semibold text-sm tracking-wide hover:text-gray-900">
+                        ACCOUNT
+                        </a>
+                    </li>
+
+                    <!-- ORDER HISTORY -->
+                    <li class="nav-item">
+                        <a id="nav-orders"
+                        href="{% url 'users:order_history' %}"
+                        hx-get="{% url 'users:order_history' %}"
+                        hx-target="#profile-main-content"
+                        hx-push-url="true"
+                        class="nav-link flex items-center text-gray-700 font-semibold text-sm tracking-wide hover:text-gray-900">
+                        ORDER HISTORY
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a href="{% url 'users:logout' %}"
+                        hx-get="{% url 'users:logout' %}"
+                        hx-target="#main-content"
+                        hx-push-url="true"
+                        class="flex items-center text-gray-700 font-semibold text-sm tracking-wide hover:text-gray-900">
+                        LOG OUT
+                        </a>
+                    </li>
                     </ul>
+
                 </div>
             </div>
             
@@ -134,16 +141,6 @@
                     </div>
                 </div>
 
-
-                 {% comment %} <!-- Order History -->
-                <div class="mt-8">
-                    <h2 class="text-xl font-semibold text-gray-900 mb-4 tracking-wide">
-                        ORDER HISTORY
-                    </h2>
-                    {% include 'users/partials/order_history.html' %}
-                </div> {% endcomment %}
-
-                
                 <!-- Recommendations -->
                 <div class="mt-8">
                     <h2 class="text-xl font-semibold text-gray-900 mb-4 tracking-wide">
@@ -180,26 +177,42 @@
         </div>
     </div>
 </div>
-
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const navItems = document.querySelectorAll('.nav-item a');
-        navItems.forEach(item => {
-            item.addEventListener('click', function() {
-                navItems.forEach(nav => nav.classList.remove('text-gray-900', 'border-l-4', 'border-gray-500', 'pl-2'));
-                this.classList.add('text-gray-900', 'border-l-4', 'border-gray-500', 'pl-2');
-            });
-        });
+(function () {
+  function $all(sel){ return Array.from(document.querySelectorAll(sel)); }
 
-        document.body.addEventListener('htmx:afterSwap', function(event) {
-            const target = event.detail.target;
-            if (target.id === 'main-content' || target.id === 'profile-main-content' || target.id === 'account-details-content') {
-                target.classList.add('animate-section');
-                setTimeout(() => {
-                    target.classList.remove('animate-section');
-                }, 500);
-            }
-        });
-    });
+  function setActiveSidebar(){
+    const path = window.location.pathname || '';
+    const acc  = document.getElementById('nav-account');
+    const ord  = document.getElementById('nav-orders');
+
+    $all('.nav-link, .nav-item a').forEach(a => a.classList.remove('is-active'));
+
+    if (path === '/users/order-history/' || path.startsWith('/users/order/')) {
+      if (ord) ord.classList.add('is-active');
+    } else if (path.startsWith('/users/profile')) {
+      if (acc) acc.classList.add('is-active');
+    } else {
+      // fallback – ако URL съвпада точно с href
+      const exact = $all('.nav-link, .nav-item a').find(a => (a.getAttribute('href')||'') === path);
+      if (exact) exact.classList.add('is-active');
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', setActiveSidebar);
+  document.body.addEventListener('htmx:afterSettle', setActiveSidebar);
+  document.body.addEventListener('htmx:pushedIntoHistory', setActiveSidebar);
+  document.body.addEventListener('htmx:afterSwap', setActiveSidebar);
+  window.addEventListener('popstate', setActiveSidebar);
+
+  // моментално маркиране при клик (без да чакаме навигацията)
+  document.addEventListener('click', (e) => {
+    const a = e.target.closest('.nav-link, .nav-item a');
+    if (!a) return;
+    $all('.nav-link, .nav-item a').forEach(x => x.classList.remove('is-active'));
+    a.classList.add('is-active');
+  });
+})();
 </script>
+
 {% endblock %}

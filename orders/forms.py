@@ -5,6 +5,7 @@ from django.utils.html import strip_tags
 class OrderForm(forms.Form):
     first_name = forms.CharField(
         max_length=50,
+        required=True,
         widget=forms.TextInput(attrs={
             'class': 'w-full px-4 py-3 border border-black rounded-none text-black placeholder-gray-500 focus:outline-none focus:border-black',
             'placeholder': 'First Name'
@@ -12,12 +13,14 @@ class OrderForm(forms.Form):
     )
     last_name = forms.CharField(
         max_length=50,
+        required=True,
         widget=forms.TextInput(attrs={
             'class': 'w-full px-4 py-3 border border-black rounded-none text-black placeholder-gray-500 focus:outline-none focus:border-black',
             'placeholder': 'Last Name'
         })
     )
     email = forms.EmailField(
+        required=True,
         widget=forms.EmailInput(attrs={
             'class': 'w-full px-4 py-3 border border-black rounded-none text-black placeholder-gray-500 focus:outline-none focus:border-black',
             'placeholder': 'Email',
@@ -34,7 +37,7 @@ class OrderForm(forms.Form):
     )
     address1 = forms.CharField(
         max_length=255,
-        required=False,
+        required=True,
         widget=forms.TextInput(attrs={
             'class': 'w-full px-4 py-3 border border-black rounded-none text-black placeholder-gray-500 focus:outline-none focus:border-black pr-10',
             'placeholder': 'Address Line 1'
@@ -50,7 +53,7 @@ class OrderForm(forms.Form):
     )
     city = forms.CharField(
         max_length=100,
-        required=False,
+        required=True,
         widget=forms.TextInput(attrs={
             'class': 'w-full px-4 py-3 border border-black rounded-none text-black placeholder-gray-500 focus:outline-none focus:border-black',
             'placeholder': 'City'
@@ -58,7 +61,7 @@ class OrderForm(forms.Form):
     )
     country = forms.CharField(
         max_length=100,
-        required=False,
+        required=True,
         widget=forms.TextInput(attrs={
             'class': 'w-full px-4 py-3 border border-black rounded-none text-black placeholder-gray-500 focus:outline-none focus:border-black',
             'placeholder': 'Country'
@@ -74,7 +77,7 @@ class OrderForm(forms.Form):
     )
     postal_code = forms.CharField(
         max_length=20,
-        required=False,
+        required=True,
         widget=forms.TextInput(attrs={
             'class': 'w-full px-4 py-3 border border-black rounded-none text-black placeholder-gray-500 focus:outline-none focus:border-black',
             'placeholder': 'Postal Code'
@@ -92,6 +95,7 @@ class OrderForm(forms.Form):
 
     def __init__(self, *args, user=None, **kwargs):
         super().__init__(*args, **kwargs)
+
         if user:
             self.fields['first_name'].initial = user.first_name
             self.fields['last_name'].initial = user.last_name

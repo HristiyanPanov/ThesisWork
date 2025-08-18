@@ -58,20 +58,17 @@
                 </div>
 
                 <div class="flex justify-between items-center mt-2">
-                    <!-- Възможен track линк или празно място -->
-                    <div class="text-sm text-gray-400 italic"> </div>
-                    
-                    <!-- Leave a review -->
-                    {% if item.product.id not in reviewed_product_ids %}
-                    <a href="#" class="text-sm font-semibold hover:underline review-btn" data-product-id="{{ item.product.id }}">
-                        Leave a review
-                    </a>
-                    {% else %}
-                    <span class="text-sm text-gray-400 italic">Already reviewed</span>
-                    {% endif %}
-                </div>
-                </div>
+                  <div class="text-sm text-gray-400 italic"> </div>
 
+                  {% if item.product.id not in reviewed_product_ids %}
+                    <a href="#" class="review-btn" data-product-id="{{ item.product.id }}">
+                      Leave a review
+                    </a>
+                  {% else %}
+                    <span class="text-gray-400 cursor-not-allowed">Review submitted</span>
+                  {% endif %}
+                </div>
+                </div>
             </div>
             {% endfor %}
 
@@ -193,13 +190,21 @@ document.getElementById('reviewForm').addEventListener('submit', function(e) {
   .then(res => res.json())
   .then(data => {
     if (data.success) {
-      alert(data.success);
+      window.showNotification(data.success);   // 🟢 toast вместо alert
       document.getElementById('reviewModal').classList.add('hidden');
       this.reset();
+      const link = document.querySelector(`.review-btn[data-product-id="${productId}"]`);
+      if (link) {
+        const span = document.createElement('span');
+        span.className = 'text-gray-400 cursor-not-allowed';
+        span.textContent = 'Review submitted';
+        link.replaceWith(span);
+      }
     } else if (data.errors) {
-      alert("Validation errors:\n" + JSON.stringify(data.errors));
+      window.showNotification("Validation errors. Please check your input."); 
+      console.error("Validation errors:", data.errors);
     } else if (data.error) {
-      alert("Error: " + data.error);
+      window.showNotification("Error: " + data.error);
     }
   });
 });

@@ -1,3 +1,5 @@
+{% load static %}
+
 <main class="mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <!-- Breadcrumb -->
     <div class="mb-8">
@@ -56,7 +58,7 @@
                     {{ product.name|upper }}
                 </h1>
                 <p class="text-lg text-gray-600 mb-4">{{ product.color|upper }}</p>
-                <p class="text-2xl font-bold text-gray-900">${{ product.price }}</p>
+                <p class="text-2xl font-bold text-gray-900">€{{ product.price }}</p>
             </div>
 
             <!-- Sizes -->
@@ -89,20 +91,65 @@
             </div>
             {% endif %}
 
+            <!-- Find My Size -->
+            <div id="find-my-size" class="mt-6 p-4 border rounded-lg bg-gray-50">
+            <h3 class="text-lg font-semibold mb-3">Find My Size</h3>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                <label class="block mb-2 text-sm font-medium">Height (cm)</label>
+                <select id="fms-height" class="w-full border rounded px-2 py-1 fms-dd">
+                    <option value="">Select height</option>
+                </select>
+                </div>
+                <div>
+                <label class="block mb-2 text-sm font-medium">Weight (kg)</label>
+                <select id="fms-weight" class="w-full border rounded px-2 py-1 fms-dd">
+                    <option value="">Select weight</option>
+                </select>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+                <div>
+                <label class="block mb-2 text-sm font-medium">
+                    Waist (cm) <span class="text-gray-500 text-xs">(optional)</span>
+                </label>
+                <select id="fms-waist" class="w-full border rounded px-2 py-1 fms-dd">
+                    <option value="">—</option>
+                </select>
+                </div>
+                <div>
+                <label class="block mb-2 text-sm font-medium">
+                    Hips (cm) <span class="text-gray-500 text-xs">(optional)</span>
+                </label>
+                <select id="fms-hips" class="w-full border rounded px-2 py-1 fms-dd">
+                    <option value="">—</option>
+                </select>
+                </div>
+            </div>
+
+            <button id="fms-calc" class="mt-4 w-full bg-black text-white py-2 rounded hover:bg-gray-800">
+                Calculate Size
+            </button>
+
+            <div id="fms-result" class="mt-3 hidden">
+                <p class="text-sm text-gray-700">
+                Recommended size: <span id="fms-reco" class="font-bold"></span>
+                </p>
+            </div>
+            </div>
+
             <!-- Buttons -->
             <div class="space-y-4">
-                <button id="add-to-cart-btn" 
+                <button id="add-to-cart-btn"
+                        data-product-slug="{{ product.slug }}"
                         class="w-full bg-black text-white py-3 px-6 text-sm font-medium hover:bg-gray-800 transition-colors"
-                        onclick="addToCart()"
                         {% if not product.product_sizes.all %}disabled{% endif %}>
-                    ADD TO CART
+                ADD TO CART
                 </button>
-                
-                <form id="add-to-wishlist-form" 
-                    action="{% url 'wishlist:add_to_wishlist' product.id %}" 
-                    method="post">
-                    {% csrf_token %}
-                </form>
+
+
 
                 {% if not user.is_authenticated %}
                 <a href="{% url 'users:login' %}?next={{ request.path }}"
@@ -123,14 +170,7 @@
                     ADD TO WISHLIST
                 </button>
                 {% endif %}
-
-
-        
-                {% comment %} </button>
                 
-                <button class="w-full border border-gray-300 py-3 px-6 text-sm font-medium hover:border-gray-900 transition-colors">
-                    ADD TO WISHLIST
-                </button> {% endcomment %}
             </div>
 
             <!-- Hidden Wishlist Form -->
@@ -167,8 +207,14 @@
                     {% for review in reviews %}
                     <div class="border-b pb-3">
                         <div class="flex items-center gap-1 mb-1">
-                            <div class="flex text-yellow-400 text-sm">
-                                {% for i in "12345"|slice:":review.rating"|make_list %}★{% endfor %}
+                            <div class="flex items-center gap-1 mb-1">
+                                <div class="flex text-sm">
+                                    {% for i in "12345"|make_list %}
+                                    <span class="{% if forloop.counter <= review.rating %}text-yellow-400{% else %}text-gray-300{% endif %}">
+                                        ★
+                                    </span>
+                                    {% endfor %}
+                                </div>
                             </div>
                             <span class="text-xs text-gray-500">({{ review.rating }}/5)</span>
                         </div>
@@ -207,7 +253,7 @@
                 <div class="text-center">
                     <h3 class="text-sm font-medium text-gray-900 mb-1">{{ related_product.name|upper }}</h3>
                     <p class="text-sm text-gray-600 mb-1">{{ related_product.color|upper }}</p>
-                    <p class="text-sm font-medium">${{ related_product.price }}</p>
+                    <p class="text-sm font-medium">€{{ related_product.price }}</p>
                 </div>
             </div>
             {% endfor %}
@@ -226,266 +272,456 @@
         opacity: 0.5;
         cursor: not-allowed;
     }
+
+    /* wrapper */
+    .fms-dd-wrap{position:relative; width:100%;}
+    /* скрий оригиналния select, но остави размера му за layout */
+    .fms-dd-wrap select{position:absolute; inset:0; opacity:0; pointer-events:none;}
+    /* бутон */
+    .fms-dd-btn{
+    width:100%; display:flex; align-items:center; justify-content:space-between;
+    border:1px solid #e5e7eb; padding:.625rem .75rem; border-radius:.25rem;
+    background:#fff; font-size:.875rem; line-height:1.25rem; cursor:pointer;
+    }
+    .fms-dd-btn:hover{border-color:#111827;}
+    /* меню */
+    .fms-dd-menu{
+    position:absolute; left:0; right:0; top:100%; margin-top:.25rem; z-index:30;
+    background:#fff; border:1px solid #e5e7eb; border-radius:.375rem;
+    box-shadow:0 10px 15px -3px rgba(0,0,0,.1),0 4px 6px -2px rgba(0,0,0,.05);
+    overflow:auto; /* ключът */
+    max-height: calc(var(--fms-item-h, 36px) * 8); /* 👈 показвай до ~8 опции */
+    }
+    .fms-dd-item{
+    padding:.5rem .75rem; font-size:.875rem; line-height:var(--fms-item-h,36px); cursor:pointer;
+    }
+    .fms-dd-item[aria-selected="true"]{background:#f3f4f6; font-weight:600;}
+    .fms-dd-item:hover{background:#f9fafb;}
+    .fms-dd-caret{margin-left:.5rem; opacity:.6;}
+
 </style>
 
+
 <script>
-    let selectedSize = null;
-    let selectedSizeId = null;
+  let selectedSize = null;
+  let selectedSizeId = null;
 
-    function changeMainImage(src) {
-        const mainImg = document.querySelector('.aspect-square img');
-        if (mainImg) {
-            mainImg.src = src;
+  function changeMainImage(src) {
+    const mainImg = document.querySelector('.aspect-square img');
+    if (mainImg) mainImg.src = src;
+  }
+
+  function updateSelectedSize() {
+    const radios = document.querySelectorAll('.size-radio');
+    const checked = Array.from(radios).find(r => r.checked && !r.disabled);
+    if (checked) {
+      selectedSize = checked.dataset.size;
+      selectedSizeId = checked.value;
+    } else {
+      selectedSize = null;
+      selectedSizeId = null;
+    }
+  }
+
+  function notify(msg){ if (typeof showNotification === 'function') showNotification(msg); }
+
+  function getCookie(name) {
+    let v = null;
+    if (document.cookie && document.cookie !== '') {
+      const cookies = document.cookie.split(';');
+      for (let c of cookies) {
+        c = c.trim();
+        if (c.substring(0, name.length + 1) === (name + '=')) {
+          v = decodeURIComponent(c.substring(name.length + 1));
+          break;
         }
+      }
+    }
+    return v;
+  }
+
+  function addToCart() {
+    const btn = document.getElementById('add-to-cart-btn');
+    if (!btn) return;
+
+    const productSlug = btn.dataset.productSlug;  // ← винаги актуален slug след HTMX swap
+    updateSelectedSize();
+
+    if (!selectedSizeId) {
+        showNotification('Please select a size');
+        return;
     }
 
-    function updateSelectedSize() {
-        const sizeRadios = document.querySelectorAll('.size-radio');
-        const checkedRadio = Array.from(sizeRadios).find(radio => radio.checked && !radio.disabled);
-        if (checkedRadio) {
-            selectedSize = checkedRadio.dataset.size;
-            selectedSizeId = checkedRadio.value;
-            console.log('Updated Selected Size:', selectedSize, 'ID:', selectedSizeId);
+    let formData = new FormData();
+    formData.append('size_id', selectedSizeId);
+    formData.append('quantity', '1');
+
+    fetch(`{% url 'cart:add_to_cart' 'PLACEHOLDER' %}`.replace('PLACEHOLDER', productSlug), {
+        method: 'POST',
+        body: formData,
+        headers: { 'X-CSRFToken': getCookie('csrftoken') }
+    })
+    .then(r => r.json().catch(()=>({})))
+    .then(data => {
+        if (data.error) {
+        showNotification(data.error);
         } else {
-            selectedSize = null;
-            selectedSizeId = null;
-            console.log('No valid size selected');
+        showNotification(data.message);
+        updateHeaderCartCount(data.total_items);
+        htmx.ajax('GET', '{% url "cart:cart_modal" %}', { target: '#cart-container', swap: 'innerHTML' });
         }
-    }
-    
-    function addToCart() {
-        const productSlug = '{{ product.slug }}';
-        console.log('Product Slug:', productSlug);
-        
-        // Update selected size before sending
-        updateSelectedSize();
-        console.log('Selected Size ID:', selectedSizeId);
-
-        if (!selectedSizeId) {
-            showNotification('Please select a size');
-            return;
-        }
-    
-
-        let formData = new FormData();
-        formData.append('size_id', selectedSizeId);
-        formData.append('quantity', '1');
-        fetch(`{% url 'cart:add_to_cart' 'PLACEHOLDER' %}`.replace('PLACEHOLDER', productSlug), {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'X-CSRFToken': getCookie('csrftoken')
-            }
-        })
-        .then(response => {
-            console.log('Response Status:', response.status);
-            return response.text().then(text => {
-                console.log('Raw response text:', text);
-                try {
-                    const json = JSON.parse(text);
-                    console.log('Parsed JSON:', json);
-                    return json;
-                } catch (e) {
-                    console.error('❌ JSON parse error:', e);
-                    showNotification('Unexpected server response');
-                    return {};
-                }
-            });
-        })
-
-        .then(data => {
-            console.log('Response Data:', data);
-            if (data.error) {
-                showNotification(data.error);
-            } else {
-                showNotification(data.message);
-                updateHeaderCartCount(data.total_items);
-                htmx.ajax('GET', '{% url "cart:cart_modal" %}', {
-                    target: '#cart-container',
-                    swap: 'innerHTML'
-                });
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            showNotification('Error adding to cart');
-        });
+    })
+    .catch(() => showNotification('Error adding to cart'));
     }
 
-
-    async function addToWishlist() {
-        const selectedSize = document.querySelector('input[name="size_id"]:checked');
-        if (!selectedSize) {
-            showNotification("Please select a size");
-            return;
-        }
-
-        const sizeId = selectedSize.value;
-        const productId = document.getElementById("add-to-wishlist-btn").dataset.productId;
-
-        const formData = new FormData();
-        formData.append("size_id", sizeId);
-
-        try {
-            const response = await fetch(`/wishlist/add/${productId}/`, {
-                method: "POST",
-                headers: {
-                    "X-CSRFToken": getCookie("csrftoken")
-                },
-                body: formData
-            });
-
-            const data = await response.json();
-
-            if (data.success) {
-                showNotification(data.message); // 🟢 Toast известие
-                // Презареждаме wishlist модала
-                htmx.ajax('GET', '/wishlist/modal/', {
-                    target: '#wishlist-container',
-                    swap: 'innerHTML'
-                });
-                // Обновяваме брояча в хедъра
-                const countSpan = document.querySelector('#wishlist-button #wishlist-count');
-                if (countSpan) {
-                    countSpan.textContent = data.count;
-                }
-            } else {
-                showNotification(data.error || "Something went wrong");
-            }
-
-        } catch (error) {
-            console.error("Wishlist Error:", error);
-            showNotification("Error adding to wishlist");
-        }
-    }
-
-
-    function ensureToastContainer() {
-        let c = document.getElementById('toast-container');
-        if (!c) {
-            c = document.createElement('div');
-            c.id = 'toast-container';
-            c.className = 'fixed top-4 right-4 z-50 space-y-2';
-            document.body.appendChild(c);
-        }
-        return c;
-    }
-
-
-    function handleWishlistClick(button) {
-        const isAuth = button.dataset.authenticated === "true";
-        if (!isAuth) {
-            const loginUrl = button.dataset.loginUrl;
-
-            // форсирай пълно зареждане извън HTMX
-            window.location.replace(loginUrl);
-            return;
-        }
-
-        updateSelectedSize();
-        addToWishlist();
-    }
-
-
-    
-    function getCookie(name) {
-        let cookieValue = null;
-        if (document.cookie && document.cookie !== '') {
-            const cookies = document.cookie.split(';');
-            for (let i = 0; i < cookies.length; i++) {
-                const cookie = cookies[i].trim();
-                if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
-                }
-            }
-        }
-        return cookieValue;
-    }
-    
-
-    function initializeSizeRadios() {
-        const sizeRadios = document.querySelectorAll('.size-radio');
-        const addToCartBtn = document.getElementById('add-to-cart-btn');
-        console.log('Size Radios Found:', sizeRadios.length);
-
-        if (sizeRadios.length === 0) {
-            console.log('No size radios available');
-            addToCartBtn.disabled = true;
-            addToCartBtn.classList.add('opacity-50', 'cursor-not-allowed');
-            showNotification('No sizes available');
-            return;
-        }
-
-        const availableRadios = Array.from(sizeRadios).filter(radio => !radio.disabled);
-        console.log('Available Size Radios:', availableRadios.length);
-
-        if (availableRadios.length === 0) {
-            console.log('All sizes are out of stock');
-            addToCartBtn.disabled = true;
-            addToCartBtn.classList.add('opacity-50', 'cursor-not-allowed');
-            showNotification('All sizes are out of stock');
-            return;
-        }
-
-        // Ensure at least one valid radio is checked
-        let checkedRadio = Array.from(sizeRadios).find(radio => radio.checked && !radio.disabled);
-        if (!checkedRadio && availableRadios.length > 0) {
-            availableRadios[0].checked = true;
-            checkedRadio = availableRadios[0];
-            console.log('Auto-checked first available radio:', checkedRadio.dataset.size, 'ID:', checkedRadio.value);
-        }
-
-        // Update selected size
-        updateSelectedSize();
-
-        // Add event listeners
-        sizeRadios.forEach(radio => {
-            radio.addEventListener('change', function(e) {
-                if (this.disabled) {
-                    console.log('Changed disabled radio:', this.dataset.size);
-                    return;
-                }
-                console.log('Radio Changed - Selected Size:', this.dataset.size, 'ID:', this.value);
-                updateSelectedSize();
-                addToCartBtn.disabled = false;
-                addToCartBtn.classList.remove('opacity-50', 'cursor-not-allowed');
-            });
-        });
-    }
-
-    document.addEventListener('DOMContentLoaded', initializeSizeRadios);
-    document.addEventListener('htmx:afterSwap', initializeSizeRadios);
-
-    const productCards = document.querySelectorAll('.product-card');
-    productCards.forEach(card => {
-        card.addEventListener('mouseenter', function() {
-            this.style.transform = 'translateY(-2px)';
-            this.style.transition = 'transform 0.3s ease';
-        });
-        card.addEventListener('mouseleave', function() {
-            this.style.transform = 'translateY(0)';
-        });
+    document.addEventListener('click', (e) => {
+        const btn = e.target.closest('#add-to-cart-btn');
+        if (!btn) return;
+        e.preventDefault();
+        addToCart();
     });
 
 
-document.addEventListener('DOMContentLoaded', function () {
+  async function addToWishlist() {
+    const checked = document.querySelector('input[name="size_id"]:checked');
+    if (!checked) return notify('Please select a size');
+
+    const sizeId = checked.value;
+    const productId = document.getElementById('add-to-wishlist-btn')?.dataset.productId;
+    if (!productId) return;
+
+    const fd = new FormData();
+    fd.append('size_id', sizeId);
+
+    try {
+      const resp = await fetch(`/wishlist/add/${productId}/`, {
+        method: 'POST',
+        headers: { 'X-CSRFToken': getCookie('csrftoken') },
+        body: fd
+      });
+      const data = await resp.json();
+      if (data.success) {
+        notify(data.message || 'Added to wishlist');
+        if (window.htmx) {
+          htmx.ajax('GET', '/wishlist/modal/', { target: '#wishlist-container', swap: 'innerHTML' });
+        }
+        const countSpan = document.querySelector('#wishlist-button #wishlist-count');
+        if (countSpan && data.count != null) countSpan.textContent = data.count;
+      } else {
+        notify(data.error || 'Something went wrong');
+      }
+    } catch {
+      notify('Error adding to wishlist');
+    }
+  }
+
+  function handleWishlistClick(button) {
+    const isAuth = button.dataset.authenticated === 'true';
+    if (!isAuth) return window.location.replace(button.dataset.loginUrl);
+    updateSelectedSize();
+    addToWishlist();
+  }
+
+  function initializeSizeRadios() {
+  const addBtn = document.getElementById('add-to-cart-btn');
+  if (!addBtn) return; // не сме на product detail -> нищо не правим
+
+  const radios = document.querySelectorAll('.size-radio');
+
+  if (!radios.length) {
+    addBtn.disabled = true;
+    addBtn.classList.add('opacity-50','cursor-not-allowed');
+    // Показваме тост САМО ако реално сме на product detail (имаме addBtn)
+    showNotification('No sizes available');
+    return;
+  }
+
+  const available = Array.from(radios).filter(r => !r.disabled);
+  if (!available.length) {
+    addBtn.disabled = true;
+    addBtn.classList.add('opacity-50','cursor-not-allowed');
+    showNotification('All sizes are out of stock');
+    return;
+  }
+
+  let checked = Array.from(radios).find(r => r.checked && !r.disabled);
+  if (!checked) { available[0].checked = true; checked = available[0]; }
+  updateSelectedSize();
+
+  radios.forEach(r => {
+    r.addEventListener('change', function() {
+      if (this.disabled) return;
+      updateSelectedSize();
+      addBtn.disabled = false;
+      addBtn.classList.remove('opacity-50','cursor-not-allowed');
+    });
+  });
+}
+
+
+  document.addEventListener('DOMContentLoaded', () => {
+    initializeSizeRadios();
+
+    // hover ефект за product cards
+    document.querySelectorAll('.product-card').forEach(card => {
+      card.addEventListener('mouseenter', () => { card.style.transform = 'translateY(-2px)'; card.style.transition = 'transform 0.3s ease'; });
+      card.addEventListener('mouseleave', () => { card.style.transform = 'translateY(0)'; });
+    });
+
+    // валидация на скритата wishlist форма
     const wishlistForm = document.querySelector('form[action*="wishlist:add"]');
     const sizeInputs = document.querySelectorAll('input[name="size_id"]');
     const hiddenSizeInput = document.getElementById('wishlist-size-id');
-
     if (wishlistForm && hiddenSizeInput) {
-        wishlistForm.addEventListener('submit', function (e) {
-            const selectedSize = Array.from(sizeInputs).find(input => input.checked);
-            if (!selectedSize) {
-                e.preventDefault();
-                showNotification('Please select a size before adding to wishlist');
-                return;
-            }
+      wishlistForm.addEventListener('submit', function (e) {
+        const selected = Array.from(sizeInputs).find(input => input.checked);
+        if (!selected) { e.preventDefault(); notify('Please select a size before adding to wishlist'); return; }
+        hiddenSizeInput.value = selected.value;
+      });
+    }
+  });
 
-            hiddenSizeInput.value = selectedSize.value;
+  document.addEventListener('htmx:afterSwap', initializeSizeRadios);
+
+
+  (function () {
+    // еднократна глобална защита
+    if (window.__FMS_BOOTED__) return;
+    window.__FMS_BOOTED__ = true;
+
+    // стартираме при първоначално зареждане + след всеки HTMX swap
+    document.addEventListener('DOMContentLoaded', initFMS);
+    document.addEventListener('htmx:afterSwap', initFMS);
+
+    // fallback: ако фрагментът се добави по друг начин
+    const mo = new MutationObserver(() => initFMS());
+    mo.observe(document.documentElement, { childList: true, subtree: true });
+
+    function initFMS() {
+        const hSel = document.getElementById('fms-height');
+        const wSel = document.getElementById('fms-weight');
+        const waistSel = document.getElementById('fms-waist');
+        const hipsSel  = document.getElementById('fms-hips');
+        const btn = document.getElementById('fms-calc');
+
+        // ако фрагментът не е наличен – излизаме
+        if (!hSel || !wSel || !waistSel || !hipsSel || !btn) return;
+
+        // пазим се от двойно пълнене в текущия фрагмент
+        if (hSel.dataset.filled === '1') return;
+
+        // запазваме първата (placeholder) опция, чистим останалото
+        keepOnlyFirstOption(hSel);
+        keepOnlyFirstOption(wSel);
+        keepOnlyFirstOption(waistSel);
+        keepOnlyFirstOption(hipsSel);
+
+        // пълним диапазоните
+        fillRange(hSel, 150, 200, 'cm');
+        fillRange(wSel,  40, 120, 'kg');
+        fillRange(waistSel, 55, 120, 'cm');
+        fillRange(hipsSel,  75, 140, 'cm');
+
+        if (window.__enhanceFmsDropdowns) {
+        window.__enhanceFmsDropdowns(document.getElementById('find-my-size'));
+        }
+
+
+        hSel.dataset.filled = '1';
+
+        // click handler
+        btn.addEventListener('click', () => {
+        const height = parseInt(hSel.value, 10);
+        const weight = parseInt(wSel.value, 10);
+        const waist  = parseInt(waistSel.value, 10) || null;
+        const hips   = parseInt(hipsSel.value, 10)  || null;
+
+        if (!height || !weight) {
+            notify('Please select height and weight');
+            return;
+        }
+
+        const size = fmsCalculate(height, weight, waist, hips);
+        fmsShow(size);
+        fmsSelectSizeRadio(size);
+        }, { once: false });
+    }
+
+    function keepOnlyFirstOption(selectEl) {
+        if (!selectEl) return;
+        const first = selectEl.options[0]?.outerHTML || '';
+        selectEl.innerHTML = first; // пазим placeholder-а
+    }
+
+    function fillRange(selectEl, from, to, unit) {
+        for (let v = from; v <= to; v++) {
+        selectEl.add(new Option(`${v} ${unit}`, String(v)));
+        }
+    }
+
+    function notify(msg) {
+        if (typeof showNotification === 'function') showNotification(msg);
+        else alert(msg);
+    }
+
+    // --- Core logic ---
+    function fmsCalculate(heightCm, weightKg, waist, hips) {
+        const h = heightCm / 100;
+        const bmi = weightKg / (h * h);
+
+        // базова карта по BMI
+        let size = (
+        bmi < 19 ? 'XS' :
+        bmi < 22 ? 'S'  :
+        bmi < 25 ? 'M'  :
+        bmi < 28 ? 'L'  :
+        bmi < 31 ? 'XL' : 'XXL'
+        );
+
+        // корекции по ръст
+        if (heightCm >= 188 && size !== 'XXL') size = bump(size, +1);
+        if (heightCm <= 160 && size !== 'XS')  size = bump(size, -1);
+
+        // фини корекции по талия/ханш (ако са подадени)
+        if (waist) {
+        if (waist >= 94) size = bump(size, +1);
+        else if (waist <= 70) size = bump(size, -1);
+        }
+        if (hips) {
+        if (hips >= 110) size = bump(size, +1);
+        else if (hips <= 92) size = bump(size, -1);
+        }
+
+        return size;
+    }
+
+    function bump(current, delta) {
+        const order = ['XS','S','M','L','XL','XXL'];
+        let i = order.indexOf(current);
+        if (i === -1) return current;
+        i = Math.min(order.length - 1, Math.max(0, i + delta));
+        return order[i];
+    }
+
+    function fmsShow(size) {
+        const box = document.getElementById('fms-result');
+        const span = document.getElementById('fms-reco');
+        if (span) span.textContent = size;
+        if (box)  box.classList.remove('hidden');
+        if (typeof showNotification === 'function') showNotification(`Recommended size: ${size}`);
+    }
+
+    // маркира наличния или най-близкия размер
+    function fmsSelectSizeRadio(targetSize) {
+        const order  = ['XS','S','M','L','XL','XXL'];
+        const radios = Array.from(document.querySelectorAll('.size-radio'));
+        if (!radios.length) return;
+
+        const available = radios.filter(r => !r.disabled);
+        if (!available.length) return;
+
+        const map = new Map();
+        available.forEach(r => map.set((r.dataset.size || '').toUpperCase(), r));
+
+        const triggerChange = (el) => {
+        el.checked = true;
+        // разпращаме change, за да се актуализират други части на страницата
+        radios.forEach(r => r.dispatchEvent(new Event('change', { bubbles: true })));
+        };
+
+        if (map.has(targetSize)) {
+        triggerChange(map.get(targetSize));
+        return;
+        }
+
+        const tIdx = order.indexOf(targetSize);
+        for (let i = tIdx + 1; i < order.length; i++) {
+        if (map.has(order[i])) {
+            triggerChange(map.get(order[i]));
+            return;
+        }
+        }
+        for (let i = tIdx - 1; i >= 0; i--) {
+        if (map.has(order[i])) {
+            triggerChange(map.get(order[i]));
+            return;
+        }
+        }
+    }
+    })();
+
+    (function(){
+    // ---------- enhancer ----------
+    function enhanceOneSelect(sel){
+    if (!sel || sel.closest('.fms-dd-wrap')) return; // вече е enhance-нат
+
+    const wrap = document.createElement('div');
+    wrap.className = 'fms-dd-wrap';
+    sel.parentNode.insertBefore(wrap, sel);
+    wrap.appendChild(sel);
+
+    // бутон
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'fms-dd-btn';
+    btn.innerHTML = `<span class="fms-dd-label">${sel.selectedOptions[0]?.text || sel.getAttribute('placeholder') || 'Select'}</span>
+                    <svg class="fms-dd-caret" width="16" height="16" viewBox="0 0 20 20" fill="currentColor"><path d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z"/></svg>`;
+    wrap.appendChild(btn);
+
+    // меню
+    const menu = document.createElement('div');
+    menu.className = 'fms-dd-menu';
+    menu.hidden = true;
+    wrap.appendChild(menu);
+
+    function rebuild(){
+        menu.innerHTML = '';
+        Array.from(sel.options).forEach((opt,i)=>{
+        const item = document.createElement('div');
+        item.className = 'fms-dd-item';
+        item.setAttribute('role','option');
+        item.setAttribute('aria-selected', opt.selected ? 'true' : 'false');
+        item.textContent = opt.text;
+        item.dataset.value = opt.value;
+        item.addEventListener('click', ()=>{
+            sel.value = opt.value;
+            sel.dispatchEvent(new Event('change',{bubbles:true}));
+            btn.querySelector('.fms-dd-label').textContent = opt.text;
+            close();
+        });
+        menu.appendChild(item);
         });
     }
-});
 
+    function open(){ menu.hidden = false; document.addEventListener('click', outsideClose, {once:true}); }
+    function close(){ menu.hidden = true; }
+    function outsideClose(e){ if (!wrap.contains(e.target)) close(); }
+
+    btn.addEventListener('click', ()=> menu.hidden ? open() : close());
+    sel.addEventListener('change', ()=>{
+        const lab = sel.selectedOptions[0]?.text || 'Select';
+        btn.querySelector('.fms-dd-label').textContent = lab;
+        menu.querySelectorAll('.fms-dd-item').forEach(el=>{
+        el.setAttribute('aria-selected', el.dataset.value==sel.value ? 'true':'false');
+        });
+    });
+
+    // 👇 НОВО: следи за промени в опциите и автоматично ребилдвай менюто
+    const obs = new MutationObserver(()=> rebuild());
+    obs.observe(sel, { childList: true });
+
+    rebuild();
+    }
+
+    function enhanceFmsDropdowns(scope=document){
+        scope.querySelectorAll('select.fms-dd').forEach(enhanceOneSelect);
+    }
+
+    // expose за да го викаме след като попълним опциите
+    window.__enhanceFmsDropdowns = enhanceFmsDropdowns;
+
+    // инициалиация при първо зареждане + след HTMX
+    document.addEventListener('DOMContentLoaded', ()=> enhanceFmsDropdowns());
+    document.addEventListener('htmx:afterSwap', e=> enhanceFmsDropdowns(e.target));
+    })();
 </script>

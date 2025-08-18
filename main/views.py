@@ -14,6 +14,8 @@ from cart.models import Cart, CartItem
 import json
 from django.core.mail import send_mail
 from django.conf import settings
+from django.contrib.auth import get_user_model
+User = get_user_model()
 
 
 class IndexView(TemplateView):
@@ -48,7 +50,6 @@ class CatalogView(TemplateView):
         'max_price': lambda queryset, value: queryset.filter(price_lte=value),
         'size': lambda queryset, value: queryset.filter(product_sizes__size__name=value),
     }
-
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -93,18 +94,22 @@ class CatalogView(TemplateView):
             context['reset_search'] = True
         
         return context
-    
 
     def get(self, request, *args, **kwargs):
         context = self.get_context_data(**kwargs)
+
         if request.headers.get('HX-Request'):
             if context.get('show_search'):
                 return TemplateResponse(request, 'main/search_input.html', context)
             elif context.get('reset_search'):
                 return TemplateResponse(request, 'main/search_button.html', {})
-            template = 'main/filter_modal.html' if request.GET.get('show_filters') == 'true' else 'main/catalog.html'
+            template = 'main/filter_modal.html' if request.GET.get('show_filters') == 'true' else 'main/partials/catalog_content.html'
             return TemplateResponse(request, template, context)
+
+        # При F5 зареждаме base.html и посочваме кой partial да вкараме в main-content
+        context["initial_content_template"] = "main/partials/catalog_content.html"
         return TemplateResponse(request, self.template_name, context)
+
     
 
 class ProductDetailView(DetailView):
@@ -112,7 +117,6 @@ class ProductDetailView(DetailView):
     template_name = 'main/base.html'
     slug_field = 'slug'
     slug_url_kwarg = 'slug'
-
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -124,17 +128,29 @@ class ProductDetailView(DetailView):
         context['current_category'] = product.category.slug
         context['wishlist_form'] = AddToWishlistForm(product=product, user=self.request.user)
         context['reviews'] = product.reviews.all().order_by('-created_at')
-
-
         return context
-    
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
         context = self.get_context_data(**kwargs)
-        if request.headers.get('HX-Request'):
-            return TemplateResponse(request, 'main/product_detail.html', context)
+
+        hx_request = request.headers.get('HX-Request')
+        hx_history_restore = request.headers.get('HX-History-Restore-Request')
+
+        print("📌 ProductDetailView GET")
+        print("   HX-Request:", hx_request)
+        print("   HX-History-Restore-Request:", hx_history_restore)
+
+        # Ако е нормално HTMX зареждане (не restore), връщаме partial
+        if hx_request and not hx_history_restore:
+            return TemplateResponse(request, 'main/partials/product_detail_content.html', context)
+
+        # Всички други случаи (F5, директно отваряне, restore) → пълен base с partial
+        context["initial_content_template"] = "main/partials/product_detail_content.html"
         return TemplateResponse(request, self.template_name, context)
+
+
+
     
 @login_required
 @csrf_exempt
@@ -228,6 +244,14 @@ def subscribe_newsletter(request):
     form = NewsletterForm(request.POST)
     if form.is_valid():
         email = form.cleaned_data['email']
+
+        # 🔹 Проверка дали имейлът съществува като User
+        if not User.objects.filter(email=email).exists():
+            return JsonResponse({
+                'success': False,
+                'errors': {'email': ['This email is not registered as a user.']}
+            }, status=400)
+
         discount_code = "WELCOME10"
 
         subscriber, created = NewsletterSubscriber.objects.get_or_create(email=email)
@@ -245,8 +269,7 @@ def subscribe_newsletter(request):
             )
 
             return JsonResponse({'success': True, 'new': True})
-        
-        # ⛔ Вече съществува
+
         return JsonResponse({'success': True, 'new': False})
 
     return JsonResponse({'success': False, 'errors': form.errors}, status=400)

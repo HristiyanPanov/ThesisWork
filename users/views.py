@@ -8,7 +8,7 @@ from .forms import CustomUserCreationForm, CustomUserLoginForm, \
     CustomUserUpdateForm
 from .models import CustomUser
 from django.contrib import messages
-from main.models import Product, ProductReview
+from main.models import Product, ProductReview, Category
 from orders.models import Order
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.http import urlsafe_base64_encode
@@ -60,7 +60,7 @@ def password_reset_request(request):
             email = form.cleaned_data["email"]
             try:
                 user = CustomUser.objects.get(email=email)
-                subject = "Password Reset Requested"
+                subject = f"{settings.EMAIL_SUBJECT_PREFIX}Password Reset Requested"
                 context = {
                     "user": user,
                     "domain": request.get_host(),
@@ -116,8 +116,6 @@ def profile_view(request):
         form = CustomUserUpdateForm(instance=request.user)
 
     recommended_products = Product.objects.all().order_by('id')[:3]
-
-    # 🔥 Добавяме latest_order точно тук
     latest_order = (
         Order.objects
         .filter(user=request.user)
@@ -126,12 +124,22 @@ def profile_view(request):
         .first()
     )
 
-    return TemplateResponse(request, 'users/profile.html', {
+    context = {
         'form': form,
         'user': request.user,
         'recommended_products': recommended_products,
         'latest_order': latest_order,
-    })
+        # нужно е за хедъра в base.html
+        'categories': Category.objects.filter(parent__isnull=True).prefetch_related('subcategories'),
+    }
+
+    # HTMX → само съдържанието
+    if request.headers.get('HX-Request') == 'true':
+        return TemplateResponse(request, 'users/partials/profile_content.html', context)
+
+    # Пълен reload / F5 → base + кой partial да вкараме
+    context['initial_content_template'] = 'users/partials/profile_content.html'
+    return TemplateResponse(request, 'main/base.html', context)
 
 
 
@@ -177,22 +185,28 @@ def logout_view(request):
 @login_required
 def order_history(request):
     orders = Order.objects.filter(user=request.user).order_by('-created_at')
-    return TemplateResponse(request, 'users/partials/order_history.html', {'orders': orders})
+    ctx = {"orders": orders}
+
+    if request.headers.get("HX-Request") == "true":
+        return render(request, "users/partials/order_history.html", ctx)
+
+    return render(request, "users/order_history.html", ctx)
+
+
 
 @login_required
 def order_detail(request, order_id):
-    order = get_object_or_404(Order, id=order_id, user=request.user)
+    order = get_object_or_404(Order.objects.prefetch_related('items__product'), id=order_id, user=request.user)
+    user_reviews_by_product = {r.product_id: r for r in ProductReview.objects.filter(user=request.user, product__in=[i.product for i in order.items.all()])}
+    reviewed_product_ids = list(user_reviews_by_product.keys())
 
-    product_ids = [item.product.id for item in order.items.all()]
-    user_reviews = ProductReview.objects.filter(user=request.user, product_id__in=product_ids)
+    ctx = {
+        "order": order,
+        "user_reviews_by_product": user_reviews_by_product,
+        "reviewed_product_ids": reviewed_product_ids
+    }
 
-    # Сет от продуктите, които имат ревю
-    reviewed_product_ids = set(user_reviews.values_list('product_id', flat=True))
-    # Речник: {product_id: review}
-    user_reviews_by_product = {review.product_id: review for review in user_reviews}
+    if request.headers.get("HX-Request") == "true":
+        return render(request, "users/partials/order_detail.html", ctx)
 
-    return TemplateResponse(request, 'users/partials/order_detail.html', {
-        'order': order,
-        'reviewed_product_ids': reviewed_product_ids,
-        'user_reviews_by_product': user_reviews_by_product,
-    })
+    return render(request, "users/order_detail.html", ctx)

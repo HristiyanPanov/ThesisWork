@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}ENFANTS RICHES DÉPRIMÉS{% endblock %}</title>
+    <title>{% block title %}AURIN{% endblock %}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/htmx.org@1.9.10"></script>
     <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
@@ -158,20 +158,114 @@
         transform: translateY(0);
         }
 
+        /* без underline вътре в sidebar */
+        .account-sidebar .nav-link::after { content:none !important; display:none !important; }
 
+        /* индикатор – малък правоъгълник */
+        .account-sidebar .nav-link { position:relative; padding:8px 0 8px 18px; }
+        .account-sidebar .nav-link.is-active::before{
+        content:""; position:absolute; left:0; top:50%; transform:translateY(-50%);
+        width:3px; height:14px; border-radius:2px; background:#9ca3af;
+        }
     </style>
+
 </head>
 <body class="bg-white">
+    <!-- Header -->
+    <header class="fixed top-0 left-0 w-full z-50 bg-white shadow-sm">
+        <div class="mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Mobile Menu Button -->
+                <button id="menuToggle" class="hamburger md:hidden">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+                
+                <!-- Logo -->
+                <div class="flex-shrink-0">
+                    <a href="{% url 'main:index' %}" 
+                       hx-get="{% url 'main:index' %}" 
+                       hx-target="#main-content" 
+                       hx-push-url="true">
+                        <h1 class="text-sm sm:text-lg font-bold tracking-tight text-left">
+                            AURIN
+                        </h1>
+                    </a>
+                </div>
+                
+                <!-- Desktop Navigation -->
+                <nav class="hidden md:flex space-x-8">
+                    {% for parent in categories %}
+                    <div class="relative group">
+                        <button class="nav-link text-sm font-medium text-gray-900 hover:text-gray-700">
+                            {{ parent.name|upper }}
+                        </button>
+
+                        {% if parent.subcategories.all %}
+                        <div class="absolute left-0 mt-2 w-40 bg-white shadow-lg opacity-0 group-hover:opacity-100 transition duration-200 z-50">
+                            <ul class="py-2">
+                                {% for subcat in parent.subcategories.all %}
+                                <li>
+                                    <a href="{% url 'main:catalog' subcat.slug %}"
+                                    hx-get="{% url 'main:catalog' subcat.slug %}"
+                                    hx-target="#main-content"
+                                    hx-push-url="true"
+                                    class="block px-4 py-2 text-sm text-gray-800 hover:bg-gray-100">
+                                        {{ subcat.name }}
+                                    </a>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </nav>
+                
+                <!-- Right side links -->
+                <div class="hidden md:flex items-center space-x-6">
+                    <div class="relative" id="mobile-search-wrapper">
+                        <button id="mobile-search-toggle" 
+                                hx-get="{% url 'main:catalog_all' %}?show_search=true" 
+                                hx-target="#mobile-search-wrapper" 
+                                hx-swap="innerHTML"
+                                class="text-sm font-medium uppercase hover:text-gray-600">
+                            SEARCH
+                        </button>
+                    </div>
+                    <a href="{% url 'users:profile' %}" 
+                    hx-get="{% url 'users:profile' %}" 
+                    hx-target="#main-content" 
+                    hx-push-url="true"
+                    class="text-sm font-medium text-gray-900 uppercase hover:text-gray-600">
+                        ACCOUNT
+                    </a>
+
+                    {% include "wishlist/includes/wishlist_button.html" %}
+
+                    <a href="#" id="desktopCart" class="text-sm font-medium text-gray-900 hover:text-gray-700">CART (0)</a>
+                </div>
+                
+                <!-- Mobile Cart Icon -->
+                <div class="md:hidden">
+                    <a href="#" id="mobileCartHeader" class="text-xs font-medium text-gray-900">CART (0)</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
     <!-- Mobile Menu Overlay -->
-    <div id="overlay" class="overlay fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"></div>
+    <div id="overlay"
+        class="overlay fixed inset-0 top-16 bg-black bg-opacity-50 z-40 md:hidden"></div>
     
     <!-- Mobile Menu -->
-    <div id="mobileMenu" class="mobile-menu fixed top-0 left-0 w-80 h-full bg-white z-50 md:hidden shadow-lg">
+    <div id="mobileMenu"
+        class="mobile-menu fixed top-16 left-0 w-80 h-[calc(100vh-4rem)] bg-white z-50 md:hidden shadow-lg">
         <div class="p-6">
             <div class="flex justify-between items-center mb-8">
                 <h2 class="text-lg font-bold tracking-tight text-left">
-                    ENFANTS RICHES <br>
-                    DÉPRIMÉS
+                    AURIN
                 </h2>   
                 <button id="closeMenu" class="hamburger active">
                     <span></span>
@@ -222,95 +316,28 @@
                 class="text-sm font-medium text-gray-900 uppercase hover:text-gray-600">
                     ACCOUNT
                 </a>
-                <a href="#" id="mobileCart" class="block text-sm font-medium text-gray-900 hover:text-gray-700 py-2">CART (0)</a>
+                <!-- Група Wishlist + Cart с по-малко разстояние -->
+                <div class="space-y-1">
+                    <a href="#"
+                    id="mobileWishlist"
+                    class="block text-sm font-medium text-gray-900 hover:text-gray-700 py-2"
+                    hx-get="/wishlist/modal/"
+                    hx-target="#wishlist-container"
+                    hx-swap="innerHTML">
+                    WISHLIST (<span id="wishlist-count-mobile">{{ wishlist_count|default:0 }}</span>)
+                    </a>
+
+                    <a href="#"
+                    id="mobileCart"
+                    class="block text-sm font-medium text-gray-900 hover:text-gray-700 py-2">
+                    CART (0)
+                    </a>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Header -->
-    <header class="sticky top-0">
-        <div class="mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-16">
-                <!-- Mobile Menu Button -->
-                <button id="menuToggle" class="hamburger md:hidden">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </button>
-                
-                <!-- Logo -->
-                <div class="flex-shrink-0">
-                    <a href="{% url 'main:index' %}" 
-                       hx-get="{% url 'main:index' %}" 
-                       hx-target="#main-content" 
-                       hx-push-url="true">
-                        <h1 class="text-sm sm:text-lg font-bold tracking-tight text-left">
-                            ENFANTS RICHES<br>
-                            DÉPRIMÉS
-                        </h1>
-                    </a>
-                </div>
-                
-                <!-- Desktop Navigation -->
-                <nav class="hidden md:flex space-x-8">
-                    {% for parent in categories %}
-                    <div class="relative group">
-                        <button class="nav-link text-sm font-medium text-gray-900 hover:text-gray-700">
-                            {{ parent.name|upper }}
-                        </button>
-
-                        {% if parent.subcategories.all %}
-                        <div class="absolute left-0 mt-2 w-40 bg-white shadow-lg opacity-0 group-hover:opacity-100 transition duration-200 z-50">
-                            <ul class="py-2">
-                                {% for subcat in parent.subcategories.all %}
-                                <li>
-                                    <a href="{% url 'main:catalog' subcat.slug %}"
-                                    hx-get="{% url 'main:catalog' subcat.slug %}"
-                                    hx-target="#main-content"
-                                    hx-push-url="true"
-                                    class="block px-4 py-2 text-sm text-gray-800 hover:bg-gray-100">
-                                        {{ subcat.name }}
-                                    </a>
-                                </li>
-                                {% endfor %}
-                            </ul>
-                        </div>
-                        {% endif %}
-                    </div>
-                    {% endfor %}
-                </nav>
-                
-                <!-- Right side links -->
-                <div class="hidden md:flex items-center space-x-6">
-                    <div class="relative" id="mobile-search-wrapper">
-                        <button id="mobile-search-toggle" 
-                                hx-get="{% url 'main:catalog_all' %}?show_search=true" 
-                                hx-target="#mobile-search-wrapper" 
-                                hx-swap="innerHTML"
-                                class="text-sm font-medium uppercase hover:text-gray-600">
-                            SEARCH
-                        </button>
-                    </div>
-                    <a href="{% url 'users:profile' %}" 
-                    hx-get="{% url 'users:profile' %}" 
-                    hx-target="#main-content" 
-                    hx-push-url="true"
-                    <a class="text-sm font-medium text-gray-900 uppercase hover:text-gray-600">
-                        ACCOUNT
-                    </a>
-
-                    {% include "wishlist/includes/wishlist_button.html" %}
-
-                    <a href="#" id="desktopCart" class="text-sm font-medium text-gray-900 hover:text-gray-700">CART (0)</a>
-                </div>
-                
-                <!-- Mobile Cart Icon -->
-                <div class="md:hidden">
-                    <a href="#" id="mobileCartHeader" class="text-xs font-medium text-gray-900">CART (0)</a>
-                </div>
-            </div>
-        </div>
-    </header>
+    
     <div id="cart-container"></div>
 
     <!-- Mounts for dynamic wishlist content -->
@@ -320,49 +347,52 @@
 
     <div id="login-modal-container"></div>
 
+    <div id="get-the-look-container"></div>
+
 
 
     <!-- Loading Indicator -->
     <div class="htmx-indicator fixed top-0 left-0 w-full h-1 bg-black z-50"></div>
 
     <!-- Main Content -->
-    <div id="main-content">
+    <div id="main-content" class="pt-16">
         {% block content %}
-            {% include 'main/home_content.html' %}
+            {% if initial_content_template %}
+                {% include initial_content_template %}
+            {% else %}
+                {% include 'main/home_content.html' %}
+            {% endif %}
         {% endblock %}
     </div>
 
 
+
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Mobile menu functionality
+        document.addEventListener('DOMContentLoaded', function () {
             const menuToggle = document.getElementById('menuToggle');
-            const closeMenu = document.getElementById('closeMenu');
+            const closeMenu  = document.getElementById('closeMenu');
             const mobileMenu = document.getElementById('mobileMenu');
-            const overlay = document.getElementById('overlay');
-    
+            const overlay    = document.getElementById('overlay');
+
             function openMobileMenu() {
-                mobileMenu.classList.add('open');
-                overlay.classList.add('active');
-                menuToggle.classList.add('active');
+                if (mobileMenu) mobileMenu.classList.add('open');
+                if (menuToggle) menuToggle.classList.add('active');
                 document.body.style.overflow = 'hidden';
             }
-    
+
             function closeMobileMenu() {
-                mobileMenu.classList.remove('open');
-                overlay.classList.remove('active');
-                menuToggle.classList.remove('active');
+                if (mobileMenu) mobileMenu.classList.remove('open');
+                if (overlay) overlay.classList.remove('active');
+                if (menuToggle) menuToggle.classList.remove('active'); // <-- вече е защитено
                 document.body.style.overflow = '';
             }
-    
-            menuToggle.addEventListener('click', openMobileMenu);
-            closeMenu.addEventListener('click', closeMobileMenu);
-            overlay.addEventListener('click', closeMobileMenu);
-    
-            // Close mobile menu after navigation
-            document.addEventListener('htmx:afterRequest', function() {
-                closeMobileMenu();
-            });
+
+            if (menuToggle) menuToggle.addEventListener('click', openMobileMenu);
+            if (closeMenu)  closeMenu.addEventListener('click', closeMobileMenu);
+            if (overlay)    overlay.addEventListener('click', closeMobileMenu);
+
+            // Затваряй мобилното меню след HTMX навигация
+            document.addEventListener('htmx:afterRequest', closeMobileMenu);
 
             // 🆕 Accordion toggles for mobile categories
             const toggles = document.querySelectorAll('.mobile-category-toggle');
@@ -439,6 +469,13 @@
                 }
             });
 
+            document.addEventListener('htmx:afterSwap', () => {
+                const desktop = document.querySelector('#wishlist-button #wishlist-count');
+                const mobile  = document.getElementById('wishlist-count-mobile');
+                if (desktop && mobile) {
+                    mobile.textContent = desktop.textContent;
+                }
+            });
     
             // Close mobile menu on window resize
             window.addEventListener('resize', function() {
@@ -588,8 +625,39 @@
                 }
             });
 
+            // Изпълнява <script> тагове от инжектиран фрагмент (inline и с src)
+            function runScriptsFrom(container) {
+                const scripts = container.querySelectorAll('script');
+                scripts.forEach(oldScript => {
+                const newScript = document.createElement('script');
+                // копирай type, src, attrs
+                for (const { name, value } of oldScript.attributes) {
+                    newScript.setAttribute(name, value);
+                }
+                // ако е inline – прехвърли кода
+                if (!oldScript.src) {
+                    newScript.text = oldScript.textContent;
+                }
+                // за да сработи изпълнението, трябва да го закачим към DOM
+                oldScript.parentNode.replaceChild(newScript, oldScript);
+                });
+            }
+
+            // След като HTMX смени #main-content, изпълни скриптовете вътре
+            document.addEventListener('htmx:afterSwap', function (e) {
+                const t = e.detail && e.detail.target;
+                if (!t) return;
+                if (t.id === 'main-content' || t.id === 'profile-main-content') {
+                    runScriptsFrom(t);
+                }
+            });
 
 
+            // Покрива и back/forward кеш (bfcache), когато се върнеш на страницата
+            window.addEventListener('pageshow', function () {
+                const main = document.getElementById('main-content');
+                if (main) runScriptsFrom(main);
+            });
 
     </script>
 </body>

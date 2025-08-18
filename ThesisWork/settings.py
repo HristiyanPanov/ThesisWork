@@ -78,6 +78,7 @@ TEMPLATES = [
 
                 'cart.context_processors.cart_processor',
                 'wishlist.context_processors.wishlist_count',
+                'main.context_processors.categories',
             ],
         },
     },
@@ -167,5 +168,6 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
-DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+DEFAULT_FROM_EMAIL = f"AURIN <{EMAIL_HOST_USER}>"
+EMAIL_SUBJECT_PREFIX = "[AURIN] "
 

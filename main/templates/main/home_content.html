@@ -8,7 +8,7 @@
                 <div class="outfit-card">
                     <div class="outfit-image-wrapper">
                         <img src="{{ outfit.image.url }}" alt="{{ outfit.title }}" class="outfit-image">
-                        <button class="get-look-btn" data-outfit-id="{{ outfit.id }}">GET THE LOOK</button>
+                        <a href="#" class="get-look-btn" data-outfit-id="{{ outfit.id }}">GET THE LOOK</a>
                     </div>
                 </div>
             {% endfor %}
@@ -23,7 +23,7 @@
                 <div class="outfit-card">
                     <div class="outfit-image-wrapper">
                         <img src="{{ outfit.image.url }}" alt="{{ outfit.title }}" class="outfit-image">
-                        <button class="get-look-btn" data-outfit-id="{{ outfit.id }}">GET THE LOOK</button>
+                        <a href="#" class="get-look-btn" data-outfit-id="{{ outfit.id }}">GET THE LOOK</a>
                     </div>
                 </div>
             {% endfor %}
@@ -50,7 +50,7 @@
 <!-- MODAL -->
 <div id="get-look-modal" class="modal" style="display: none;">
   <div id="modal-overlay" class="modal-overlay"></div>
-  <div class="modal-content" id="modal-content" hx-boost="true" hx-target="#main-content">
+  <div class="modal-content" id="modal-content" hx-target="#main-content">
     <!-- AJAX content -->
     <button class="modal-close-btn" id="modal-close">×</button>
   </div>
@@ -300,218 +300,206 @@
 
 
 <script>
-  function closeModal() {
-    const modal = document.getElementById('get-look-modal');
-    const modalContent = document.getElementById('modal-content');
-
-    modal.classList.add('fade-out');
-
-    setTimeout(() => {
-      modal.style.display = 'none';
-      modal.classList.remove('fade-out');
-      modalContent.innerHTML = '';
-    }, 300); // Съответства на .3s от CSS анимацията
-  }
-
-  function attachGetTheLookHandlers() {
-    const buttons = document.querySelectorAll('.get-look-btn');
-    const modal = document.getElementById('get-look-modal');
-    const modalContent = document.getElementById('modal-content');
-
-    buttons.forEach(button => {
-      button.addEventListener('click', () => {
-        const outfitId = button.dataset.outfitId;
-
-        fetch(`/get-look/${outfitId}/`)
-          .then(res => res.text())
-          .then(html => {
-            modalContent.innerHTML = html;
-            modal.classList.remove('fade-out');
-            modal.classList.add('fade-in');
-            modal.style.display = 'flex';
-
-            setTimeout(() => {
-              modal.classList.remove('fade-in');
-            }, 300); // премахва класа след като анимацията завърши
-
-            const closeBtn = document.getElementById('modal-close');
-            if (closeBtn) {
-              closeBtn.addEventListener('click', closeModal);
-            }
-
-            const addToCartBtn = document.getElementById('add-to-cart-btn');
-            const sizeSelects = document.querySelectorAll('.product-size-select');
-
-            function updateAddButton() {
-              let selectedCount = 0;
-
-              sizeSelects.forEach(select => {
-                if (select.value !== "") {
-                  selectedCount++;
-                }
-              });
-
-              if (selectedCount === 0) {
-                addToCartBtn.disabled = true;
-                addToCartBtn.classList.remove('active');
-                addToCartBtn.textContent = 'ADD TO CART';
-              } else {
-                addToCartBtn.disabled = false;
-                addToCartBtn.classList.add('active');
-                addToCartBtn.textContent = `ADD ${selectedCount} ITEM${selectedCount > 1 ? 'S' : ''} TO CART`;
-              }
-            }
-
-            sizeSelects.forEach(select => {
-              select.addEventListener('change', updateAddButton);
-            });
-
-            updateAddButton();
-
-            addToCartBtn.addEventListener('click', () => {
-              const selectedItems = [];
-
-              sizeSelects.forEach(select => {
-                const sizeId = select.value;
-                const productId = select.dataset.productId;
-
-                if (sizeId) {
-                  selectedItems.push({
-                    product_id: productId,
-                    size_id: sizeId
-                  });
-                }
-              });
-
-              fetch('/add-outfit-to-cart/', {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                  'X-CSRFToken': getCookie('csrftoken')
-                },
-                body: JSON.stringify({ products: selectedItems })
-              })
-                .then(response => response.json())
-                .then(data => {
-                  if (data.success) {
-                    closeModal();
-
-                    htmx.ajax('GET', '/cart/', {
-                      target: '#cart-container',
-                      swap: 'innerHTML'
-                    });
-
-                    updateHeaderCartCount(data.cart_count);
-
-                    showNotification(`${data.added_count} item${data.added_count > 1 ? 's' : ''} added to cart`);
-                  } else {
-                    alert(data.error || 'Something went wrong.');
-                  }
-                });
-            });
-          });
-      });
-    });
-
-    if (modal) {
-      modal.addEventListener('click', function (event) {
-        if (event.target === modal) {
-          closeModal();
-        }
-      });
-    }
-  }
-
-  document.addEventListener('DOMContentLoaded', attachGetTheLookHandlers);
-
-  document.addEventListener('htmx:afterSwap', function (e) {
-    if (e.detail.target.id === 'main-content') {
-      attachGetTheLookHandlers();
-    }
-  });
-
-  document.addEventListener('htmx:beforeRequest', function () {
-    closeModal();
-  });
-
-
+(function () {
+  // предотвратяваме двойна инициализация
+  if (window.__getLookDelegated__) return;
+  window.__getLookDelegated__ = true;
 
   function getCookie(name) {
     let cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-      const cookies = document.cookie.split(';');
+    if (document.cookie && document.cookie !== "") {
+      const cookies = document.cookie.split("; ");
       for (let i = 0; i < cookies.length; i++) {
-        const cookie = cookies[i].trim();
-        if (cookie.startsWith(name + '=')) {
-          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-          break;
-        }
+        const [key, value] = cookies[i].split("=");
+        if (key === name) { cookieValue = decodeURIComponent(value); break; }
       }
     }
     return cookieValue;
   }
 
-  function navigateToProduct(slug) {
-    closeModal(); // затвори модала
+  function closeModal() {
+    const modal = document.getElementById('get-look-modal');
+    const modalContent = document.getElementById('modal-content');
+    if (!modal || !modalContent) return;
 
-    // След кратко забавяне – навигирай към продукта
+    modal.classList.add('fade-out');
     setTimeout(() => {
-      htmx.ajax('GET', `/product/${slug}/`, {
-        target: '#main-content',
-        pushUrl: true,
-        swap: 'innerHTML'
-      });
-    }, 300); // чакаме малко, за да не се сблъска със затваряне на модала
+      modal.style.display = 'none';
+      modal.classList.remove('fade-out');
+      modalContent.innerHTML = '';
+    }, 300);
   }
 
-  // Клик по overlay да затваря модала
+  // 1) Делегиран клик за GET THE LOOK (работи и след HTMX)
+  document.addEventListener('click', function (e) {
+    const btn = e.target.closest('.get-look-btn');
+    if (!btn) return;
+
+    e.preventDefault();
+    const outfitId = btn.dataset.outfitId;
+    const modal = document.getElementById('get-look-modal');
+    const modalContent = document.getElementById('modal-content');
+    if (!outfitId || !modal || !modalContent) return;
+
+    // зареждаме съдържанието на модала
+    fetch(`/get-look/${outfitId}/`)
+      .then(res => res.text())
+      .then(html => {
+        modalContent.innerHTML = html;
+
+        // показване + анимация
+        modal.classList.remove('fade-out');
+        modal.style.display = 'flex';
+        requestAnimationFrame(() => modal.classList.add('fade-in'));
+        setTimeout(() => modal.classList.remove('fade-in'), 300);
+
+        // затваряне (хикс/overlay)
+        const closeBtn = document.getElementById('modal-close');
+        if (closeBtn) closeBtn.addEventListener('click', closeModal);
+
+        // логика за бутона ADD TO CART вътре в модала
+        const addToCartBtn = document.getElementById('add-to-cart-btn');
+        const sizeSelects = document.querySelectorAll('.product-size-select');
+
+        function updateAddButton() {
+          let selected = 0;
+          sizeSelects.forEach(s => { if (s.value) selected++; });
+          if (!addToCartBtn) return;
+          if (selected === 0) {
+            addToCartBtn.disabled = true;
+            addToCartBtn.classList.remove('active');
+            addToCartBtn.textContent = 'ADD TO CART';
+          } else {
+            addToCartBtn.disabled = false;
+            addToCartBtn.classList.add('active');
+            addToCartBtn.textContent = `ADD ${selected} ITEM${selected > 1 ? 'S' : ''} TO CART`;
+          }
+        }
+        sizeSelects.forEach(s => s.addEventListener('change', updateAddButton));
+        updateAddButton();
+
+        if (addToCartBtn) {
+          addToCartBtn.addEventListener('click', () => {
+            const selectedItems = [];
+            sizeSelects.forEach(s => {
+              if (s.value) selectedItems.push({ product_id: s.dataset.productId, size_id: s.value });
+            });
+
+            fetch('/add-outfit-to-cart/', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+              },
+              body: JSON.stringify({ products: selectedItems })
+            })
+              .then(r => r.json())
+              .then(data => {
+                if (data.success) {
+                  closeModal();
+                  if (window.htmx) {
+                    htmx.ajax('GET', '/cart/', { target: '#cart-container', swap: 'innerHTML' });
+                  }
+                  if (window.updateHeaderCartCount) window.updateHeaderCartCount(data.cart_count);
+                  if (window.showNotification) window.showNotification(`${data.added_count} item${data.added_count > 1 ? 's' : ''} added to cart`);
+                } else {
+                  alert(data.error || 'Something went wrong.');
+                }
+              });
+          });
+        }
+      });
+  });
+
+  // 2) Клик извън съдържанието затваря модала
   document.addEventListener('click', function (e) {
     const modal = document.getElementById('get-look-modal');
     const modalContent = document.getElementById('modal-content');
+    if (!modal || !modalContent) return;
+    if (modal.style.display === 'none') return;
+    if (modal.contains(e.target) && !modalContent.contains(e.target)) closeModal();
+  });
 
+  // 3) Newsletter (оставяме както е, но с гард ако ел. липсва)
+  const form = document.getElementById('newsletter-form');
+  if (form) {
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      const formData = new FormData(form);
+      const message = document.getElementById('newsletter-message');
+
+      fetch('/subscribe-newsletter/', {
+        method: 'POST',
+        headers: { 'X-CSRFToken': getCookie('csrftoken') },
+        body: formData
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (!message) return;
+        if (data.success) {
+          if (data.new) {
+            message.textContent = "✅ Successfully subscribed! Check your email for the code.";
+            message.style.color = "green";
+          } else {
+            message.textContent = "ℹ️ You are already subscribed. Check your inbox for the code.";
+            message.style.color = "#444";
+          }
+        } else {
+          message.textContent = "❌ Please enter a valid email.";
+          message.style.color = "red";
+        }
+      });
+    });
+  }
+})();
+
+// направи функцията глобална, за да я вижда inline onclick в модала
+  window.navigateToProduct = async function (slug) {
+    const modal = document.getElementById('get-look-modal');
+    const modalContent = document.getElementById('modal-content');
     if (!modal || !modalContent) return;
 
-    // Ако модалът не е видим – нищо не правим
-    if (modal.style.display === 'none') return;
+    // анимация за затваряне
+    modal.classList.add('fade-out');
 
-    // Ако кликнатият елемент е извън съдържанието
-    if (modal.contains(e.target) && !modalContent.contains(e.target)) {
-      closeModal();
-    }
-  });
+    setTimeout(async () => {
+      modal.style.display = 'none';
+      modal.classList.remove('fade-out');
+      modalContent.innerHTML = '';
 
+      const url = `/product/${slug}/`;
 
-  document.getElementById('newsletter-form').addEventListener('submit', function (e) {
-    e.preventDefault();
-    const form = e.target;
-    const formData = new FormData(form);
-    const message = document.getElementById('newsletter-message');
+      try {
+        // Зареждаме ПЪЛНАТА страница (без HX-Request)
+        const res = await fetch(url, { credentials: 'same-origin' });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
 
-    fetch('/subscribe-newsletter/', {
-      method: 'POST',
-      headers: {
-        'X-CSRFToken': getCookie('csrftoken'),
-      },
-      body: formData
-    })
-    .then(res => res.json())
-    .then(data => {
-      if (data.success) {
-        if (data.new) {
-          message.textContent = "✅ Successfully subscribed! Check your email for the code.";
-          message.style.color = "green";
-        } else {
-          message.textContent = "ℹ️ You are already subscribed. Check your inbox for the code.";
-          message.style.color = "#444";
+        const html = await res.text();
+        const doc  = new DOMParser().parseFromString(html, 'text/html');
+
+        // Вземаме #main-content от върнатия HTML
+        const newMain = doc.querySelector('#main-content');
+        const curMain = document.querySelector('#main-content');
+        if (newMain && curMain) {
+          curMain.innerHTML = newMain.innerHTML;
         }
-      } else {
-        message.textContent = "❌ Please enter a valid email.";
-        message.style.color = "red";
+
+        // Обновяваме заглавието и URL-а
+        document.title = doc.title || document.title;
+        history.pushState({ url }, '', url);
+
+        // по желание: скрол до началото
+        window.scrollTo({ top: 0, behavior: 'instant' });
+      } catch (e) {
+        // Фолбек – класическа навигация
+        window.location.assign(url);
       }
-    });
-  });
+    }, 300);
+  };
+
 
 </script>
+
 
 
 

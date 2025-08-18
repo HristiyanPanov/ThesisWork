@@ -24,7 +24,7 @@
     <div>
       <p style="font-weight: 600; margin: 0;">{{ entry.product.name }}</p>
       <p style="margin: 4px 0;">{{ entry.product.color }}</p>
-      <p style="font-weight: bold; margin: 4px 0;">${{ entry.product.price }}</p>
+      <p style="font-weight: bold; margin: 4px 0;">€{{ entry.product.price }}</p>
       <select class="product-size-select" data-product-id="{{ entry.product.id }}" style="padding: 6px 10px; border-radius: 6px; border: 1px solid #ccc;">
         <option value="">Select Size</option>
         {% for ps in entry.sizes %}
