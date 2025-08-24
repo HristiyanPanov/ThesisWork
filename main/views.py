@@ -137,10 +137,6 @@ class ProductDetailView(DetailView):
         hx_request = request.headers.get('HX-Request')
         hx_history_restore = request.headers.get('HX-History-Restore-Request')
 
-        print("📌 ProductDetailView GET")
-        print("   HX-Request:", hx_request)
-        print("   HX-History-Restore-Request:", hx_history_restore)
-
         # Ако е нормално HTMX зареждане (не restore), връщаме partial
         if hx_request and not hx_history_restore:
             return TemplateResponse(request, 'main/partials/product_detail_content.html', context)
@@ -220,7 +216,7 @@ def add_outfit_to_cart(request):
 
             # Вземаме продукта и размера
             product = Product.objects.get(id=product_id)
-            product_size = ProductSize.objects.get(product=product, size_id=size_id)
+            product_size = ProductSize.objects.get(id=size_id)
 
             # Използваме вградения метод на Cart
             cart.add_product(product, product_size, quantity=1)

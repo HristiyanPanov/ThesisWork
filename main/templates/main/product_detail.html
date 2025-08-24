@@ -149,8 +149,6 @@
                 ADD TO CART
                 </button>
 
-
-
                 {% if not user.is_authenticated %}
                 <a href="{% url 'users:login' %}?next={{ request.path }}"
                 hx-get="{% url 'users:login' %}?next={{ request.path }}"

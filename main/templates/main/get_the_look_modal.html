@@ -28,7 +28,7 @@
       <select class="product-size-select" data-product-id="{{ entry.product.id }}" style="padding: 6px 10px; border-radius: 6px; border: 1px solid #ccc;">
         <option value="">Select Size</option>
         {% for ps in entry.sizes %}
-            <option value="{{ ps.size.id }}">{{ ps.size.name }}</option>
+            <option value="{{ ps.id }}">{{ ps.size.name }}</option>
         {% endfor %}
       </select>
     </div>
