@@ -33,7 +33,10 @@ def register(request):
             return redirect('main:index')
     else:
         form = CustomUserCreationForm()
-    return render(request, 'users/register.html', {'form': form})
+
+    if request.headers.get("HX-Request"):
+        return render(request, "users/partials/register_form.html", {"form": form})
+    return render(request, "users/register.html", {"form": form})
 
 
 def login_view(request):
