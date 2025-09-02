@@ -1,4 +1,5 @@
 {% load static %}
+{% load i18n %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -231,7 +232,7 @@
                                 hx-target="#mobile-search-wrapper" 
                                 hx-swap="innerHTML"
                                 class="text-sm font-medium uppercase hover:text-gray-600">
-                            SEARCH
+                            {% trans "SEARCH" %}
                         </button>
                     </div>
                     <a href="{% url 'users:profile' %}" 
@@ -239,18 +240,31 @@
                     hx-target="#main-content" 
                     hx-push-url="true"
                     class="text-sm font-medium text-gray-900 uppercase hover:text-gray-600">
-                        ACCOUNT
+                        {% trans "ACCOUNT" %}
                     </a>
 
                     {% include "wishlist/includes/wishlist_button.html" %}
 
-                    <a href="#" id="desktopCart" class="text-sm font-medium text-gray-900 hover:text-gray-700">CART (0)</a>
+                    <a href="#" id="desktopCart" class="text-sm font-medium text-gray-900 hover:text-gray-700">{% trans "CART" %} (0)</a>
                 </div>
                 
                 <!-- Mobile Cart Icon -->
                 <div class="md:hidden">
-                    <a href="#" id="mobileCartHeader" class="text-xs font-medium text-gray-900">CART (0)</a>
+                    <a href="#" id="mobileCartHeader" class="text-xs font-medium text-gray-900">{% trans "CART" %} (0)</a>
                 </div>
+                <form action="{% url 'set_language' %}" method="post" class="hidden md:block">
+                {% csrf_token %}
+                <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                {% get_current_language as LANGUAGE_CODE %}
+                {% get_available_languages as LANGUAGES %}
+                <select name="language"
+                        onchange="this.form.submit()"
+                        class="text-xs font-medium uppercase hover:text-gray-600 border border-gray-300 px-2 py-1 rounded">
+                    {% for code, name in LANGUAGES %}
+                    <option value="{{ code }}" {% if code == LANGUAGE_CODE %}selected{% endif %}>{{ name }}</option>
+                    {% endfor %}
+                </select>
+                </form>
             </div>
         </div>
     </header>
@@ -280,7 +294,7 @@
                 hx-target="#main-content" 
                 hx-push-url="true"
                 class="mobile-nav-link block text-lg font-medium text-gray-900 hover:text-gray-700 py-2 border-b border-gray-200">
-                HOME
+                {% trans "HOME" %}
             </a>
 
             {% for parent in categories %}
@@ -308,13 +322,13 @@
             </nav>
             
             <div class="mt-8 space-y-4">
-                <a href="#" class="block text-sm font-medium text-gray-900 hover:text-gray-700 py-2">SEARCH</a>
+                <a href="#" class="block text-sm font-medium text-gray-900 hover:text-gray-700 py-2">{% trans "SEARCH" %}</a>
                 <a href="{% url 'users:profile' %}" 
                 hx-get="{% url 'users:profile' %}" 
                 hx-target="#main-content" 
                 hx-push-url="true"
                 class="text-sm font-medium text-gray-900 uppercase hover:text-gray-600">
-                    ACCOUNT
+                    {% trans "ACCOUNT" %}
                 </a>
                 <!-- Група Wishlist + Cart с по-малко разстояние -->
                 <div class="space-y-1">
@@ -324,16 +338,29 @@
                     hx-get="/wishlist/modal/"
                     hx-target="#wishlist-container"
                     hx-swap="innerHTML">
-                    WISHLIST (<span id="wishlist-count-mobile">{{ wishlist_count|default:0 }}</span>)
+                    {% trans "WISHLIST" %} (<span id="wishlist-count-mobile">{{ wishlist_count|default:0 }}</span>)
                     </a>
 
                     <a href="#"
                     id="mobileCart"
                     class="block text-sm font-medium text-gray-900 hover:text-gray-700 py-2">
-                    CART (0)
+                    {% trans "CART" %} (0)
                     </a>
                 </div>
             </div>
+            <form action="{% url 'set_language' %}" method="post" class="mt-2">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ request.get_full_path }}">
+            {% get_current_language as LANGUAGE_CODE %}
+            {% get_available_languages as LANGUAGES %}
+            <select name="language"
+                    onchange="this.form.submit()"
+                    class="block w-full text-sm border border-gray-300 px-2 py-2 rounded">
+                {% for code, name in LANGUAGES %}
+                <option value="{{ code }}" {% if code == LANGUAGE_CODE %}selected{% endif %}>{{ name }}</option>
+                {% endfor %}
+            </select>
+            </form>
         </div>
     </div>
 
@@ -369,6 +396,7 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
+            const CART_LABEL = "{% trans 'CART' %}";
             const menuToggle = document.getElementById('menuToggle');
             const closeMenu  = document.getElementById('closeMenu');
             const mobileMenu = document.getElementById('mobileMenu');
@@ -432,7 +460,7 @@
                 const mobileCart = document.getElementById('mobileCart');
                 const mobileCartHeader = document.getElementById('mobileCartHeader');
 
-                const cartText = `CART (${count})`;
+                const cartText = `${CART_LABEL} (${count})`;
 
                 if (desktopCart) desktopCart.textContent = cartText;
                 if (mobileCart) mobileCart.textContent = cartText;
@@ -514,7 +542,7 @@
             const desktopCart = document.getElementById('desktopCart');
             const mobileCart = document.getElementById('mobileCart');
             const mobileCartHeader = document.getElementById('mobileCartHeader');
-            const cartText = `CART (${count})`;
+            const cartText = `${CART_LABEL} (${count})`;
             
             if (desktopCart) desktopCart.textContent = cartText;
             if (mobileCart) mobileCart.textContent = cartText;
@@ -642,6 +670,7 @@
                 oldScript.parentNode.replaceChild(newScript, oldScript);
                 });
             }
+            window.runScriptsFrom = runScriptsFrom;
 
             // След като HTMX смени #main-content, изпълни скриптовете вътре
             document.addEventListener('htmx:afterSwap', function (e) {

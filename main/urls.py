@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, include
 from . import views
 from .views import get_outfit_modal, add_outfit_to_cart
 

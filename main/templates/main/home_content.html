@@ -482,6 +482,10 @@
         const curMain = document.querySelector('#main-content');
         if (newMain && curMain) {
           curMain.innerHTML = newMain.innerHTML;
+
+          if (window.runScriptsFrom) window.runScriptsFrom(curMain);
+          document.dispatchEvent(new CustomEvent('htmx:afterSwap',   { detail:{ target: curMain, elt: curMain }}));
+          document.dispatchEvent(new CustomEvent('htmx:afterSettle', { detail:{ target: curMain, elt: curMain }}));
         }
 
         // Обновяваме заглавието и URL-а

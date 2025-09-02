@@ -11,6 +11,7 @@ urlpatterns = [
     path('payment/', include('payment.urls', namespace='payment')),
     path('wishlist/', include('wishlist.urls', namespace='wishlist')),
     path('', include('main.urls', namespace='main')),
+    path("i18n/", include("django.conf.urls.i18n")),
 ]
 
 if settings.DEBUG:
