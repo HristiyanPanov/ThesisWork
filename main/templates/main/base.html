@@ -258,7 +258,7 @@
                 {% get_current_language as LANGUAGE_CODE %}
                 {% get_available_languages as LANGUAGES %}
                 <select name="language"
-                        onchange="this.form.submit()"
+                        onchange="window.langSwitch(this)"
                         class="text-xs font-medium uppercase hover:text-gray-600 border border-gray-300 px-2 py-1 rounded">
                     {% for code, name in LANGUAGES %}
                     <option value="{{ code }}" {% if code == LANGUAGE_CODE %}selected{% endif %}>{{ name }}</option>
@@ -354,7 +354,7 @@
             {% get_current_language as LANGUAGE_CODE %}
             {% get_available_languages as LANGUAGES %}
             <select name="language"
-                    onchange="this.form.submit()"
+                    onchange="window.langSwitch(this)"
                     class="block w-full text-sm border border-gray-300 px-2 py-2 rounded">
                 {% for code, name in LANGUAGES %}
                 <option value="{{ code }}" {% if code == LANGUAGE_CODE %}selected{% endif %}>{{ name }}</option>
@@ -396,7 +396,6 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            const CART_LABEL = "{% trans 'CART' %}";
             const menuToggle = document.getElementById('menuToggle');
             const closeMenu  = document.getElementById('closeMenu');
             const mobileMenu = document.getElementById('mobileMenu');
@@ -454,21 +453,6 @@
             
             // Get initial cart count
             updateCartCount();
-            
-            function updateHeaderCartCount(count) {
-                const desktopCart = document.getElementById('desktopCart');
-                const mobileCart = document.getElementById('mobileCart');
-                const mobileCartHeader = document.getElementById('mobileCartHeader');
-
-                const cartText = `${CART_LABEL} (${count})`;
-
-                if (desktopCart) desktopCart.textContent = cartText;
-                if (mobileCart) mobileCart.textContent = cartText;
-                if (mobileCartHeader) mobileCartHeader.textContent = cartText;
-
-                console.log('🛒 Updated header cart count to:', cartText);
-            }
-
 
             
             function updateCartCount() {
@@ -538,15 +522,19 @@
         });
         
         // Global function to update cart count
-        window.updateHeaderCartCount = function(count) {
-            const desktopCart = document.getElementById('desktopCart');
-            const mobileCart = document.getElementById('mobileCart');
-            const mobileCartHeader = document.getElementById('mobileCartHeader');
-            const cartText = `${CART_LABEL} (${count})`;
-            
-            if (desktopCart) desktopCart.textContent = cartText;
-            if (mobileCart) mobileCart.textContent = cartText;
-            if (mobileCartHeader) mobileCartHeader.textContent = cartText;
+        window.CART_LABEL = "{% trans 'CART' %}";
+
+        window.updateHeaderCartCount = function (count) {
+            const desktop = document.getElementById('desktopCart');
+            const mobile  = document.getElementById('mobileCart');
+            const mobileHeader = document.getElementById('mobileCartHeader');
+
+            const label = window.CART_LABEL || 'CART';
+            const text  = `${label} (${count})`;
+
+            if (desktop) desktop.textContent = text;
+            if (mobile)  mobile.textContent  = text;
+            if (mobileHeader) mobileHeader.textContent = text;
         };
 
             function handleWishlistButtonClick(btn) {
@@ -675,10 +663,7 @@
             // След като HTMX смени #main-content, изпълни скриптовете вътре
             document.addEventListener('htmx:afterSwap', function (e) {
                 const t = e.detail && e.detail.target;
-                if (!t) return;
-                if (t.id === 'main-content' || t.id === 'profile-main-content') {
-                    runScriptsFrom(t);
-                }
+                if (t) runScriptsFrom(t);
             });
 
 
@@ -688,6 +673,14 @@
                 if (main) runScriptsFrom(main);
             });
 
+            window.langSwitch = function(selectEl){
+                const form = selectEl.form;
+                const nextInput = form.querySelector('input[name="next"]');
+                if (nextInput) {
+                nextInput.value = location.pathname + location.search + location.hash; // текущият URL
+                }
+                form.submit(); // стандартният POST към set_language с правилния next
+            };
     </script>
 </body>
 </html>

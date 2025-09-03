@@ -1,11 +1,12 @@
+{% load i18n %}
 <main class="mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <!-- Breadcrumb and Filters -->
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 sm:mb-12 space-y-4 sm:space-y-0">
         <h2 class="text-xl sm:text-2xl font-bold tracking-tight text-gray-900 uppercase">
             {% if current_category %}
-                {{ current_category|upper }} > NEW ARRIVALS
+                {{ current_category|upper }} > {% trans "NEW ARRIVALS" %}
             {% else %}
-                ALL PRODUCTS
+                {% trans "ALL PRODUCTS" %}
             {% endif %}
         </h2>
         <button class="bg-black text-white px-4 py-2 text-sm font-medium uppercase hover:bg-gray-800 transition-colors w-full sm:w-auto" 
@@ -13,7 +14,7 @@
                 hx-target="#filter-modal-content"
                 hx-swap="innerHTML"
                 hx-on::after-request="document.getElementById('filter-modal').classList.remove('hidden')">
-            FILTERS
+            {% trans "FILTERS" %}
         </button>
     </div>
 
@@ -37,7 +38,7 @@
                          class="product-image w-full h-full object-cover">
                 {% else %}
                     <div class="product-image w-full h-full bg-gray-200 flex items-center justify-center">
-                        <span class="text-gray-400 text-sm">No Image</span>
+                        <span class="text-gray-400 text-sm">{% trans "No Image" %}</span>
                     </div>
                 {% endif %}
             </div>
@@ -51,12 +52,12 @@
     </div>
     {% else %}
     <div class="text-center py-20">
-        <h3 class="text-2xl font-bold text-gray-900 mb-4 uppercase">No products found</h3>
+        <h3 class="text-2xl font-bold text-gray-900 mb-4 uppercase">{% trans "No products found" %}</h3>
         <p class="text-gray-600 mb-8">
             {% if current_category %}
-                No products available in this category yet.
+                {% trans "No products available in this category yet." %}
             {% else %}
-                No products available at the moment.
+                {% trans "No products available at the moment." %}
             {% endif %}
         </p>
         <a href="{% url 'main:index' %}" 
@@ -64,11 +65,12 @@
            hx-target="#main-content" 
            hx-push-url="true"
            class="bg-black text-white px-6 py-3 text-sm font-medium uppercase hover:bg-gray-800 transition-colors">
-            Back to Home
+            {% trans "Back to Home" %}
         </a>
     </div>
     {% endif %}
 </main>
+
 
 <script>
     // Product card hover and click functionality

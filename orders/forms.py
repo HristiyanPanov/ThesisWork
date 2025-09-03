@@ -1,5 +1,6 @@
 from django import forms
 from django.utils.html import strip_tags
+from django.utils.translation import gettext_lazy as _
 
 
 class OrderForm(forms.Form):
@@ -8,7 +9,7 @@ class OrderForm(forms.Form):
         required=True,
         widget=forms.TextInput(attrs={
             'class': 'w-full px-4 py-3 border border-black rounded-none text-black placeholder-gray-500 focus:outline-none focus:border-black',
-            'placeholder': 'First Name'
+            'placeholder': _('First Name')
         })
     )
     last_name = forms.CharField(
@@ -16,14 +17,14 @@ class OrderForm(forms.Form):
         required=True,
         widget=forms.TextInput(attrs={
             'class': 'w-full px-4 py-3 border border-black rounded-none text-black placeholder-gray-500 focus:outline-none focus:border-black',
-            'placeholder': 'Last Name'
+            'placeholder': _('Last Name')
         })
     )
     email = forms.EmailField(
         required=True,
         widget=forms.EmailInput(attrs={
             'class': 'w-full px-4 py-3 border border-black rounded-none text-black placeholder-gray-500 focus:outline-none focus:border-black',
-            'placeholder': 'Email',
+            'placeholder': _('Email'),
             'readonly': 'readonly'
         })
     )
@@ -32,7 +33,7 @@ class OrderForm(forms.Form):
         required=False,
         widget=forms.TextInput(attrs={
             'class': 'w-full px-4 py-3 border border-black rounded-none text-black placeholder-gray-500 focus:outline-none focus:border-black',
-            'placeholder': 'Company (optional)'
+            'placeholder': _('Company (optional)')
         })
     )
     address1 = forms.CharField(
@@ -40,7 +41,7 @@ class OrderForm(forms.Form):
         required=True,
         widget=forms.TextInput(attrs={
             'class': 'w-full px-4 py-3 border border-black rounded-none text-black placeholder-gray-500 focus:outline-none focus:border-black pr-10',
-            'placeholder': 'Address Line 1'
+            'placeholder': _('Address Line 1')
         })
     )
     address2 = forms.CharField(
@@ -48,7 +49,7 @@ class OrderForm(forms.Form):
         required=False,
         widget=forms.TextInput(attrs={
             'class': 'w-full px-4 py-3 border border-black rounded-none text-black placeholder-gray-500 focus:outline-none focus:border-black',
-            'placeholder': 'Address Line 2 (optional)'
+            'placeholder': _('Address Line 2 (optional)')
         })
     )
     city = forms.CharField(
@@ -56,7 +57,7 @@ class OrderForm(forms.Form):
         required=True,
         widget=forms.TextInput(attrs={
             'class': 'w-full px-4 py-3 border border-black rounded-none text-black placeholder-gray-500 focus:outline-none focus:border-black',
-            'placeholder': 'City'
+            'placeholder': _('City')
         })
     )
     country = forms.CharField(
@@ -64,7 +65,7 @@ class OrderForm(forms.Form):
         required=True,
         widget=forms.TextInput(attrs={
             'class': 'w-full px-4 py-3 border border-black rounded-none text-black placeholder-gray-500 focus:outline-none focus:border-black',
-            'placeholder': 'Country'
+            'placeholder': _('Country')
         })
     )
     province = forms.CharField(
@@ -72,7 +73,7 @@ class OrderForm(forms.Form):
         required=False,
         widget=forms.TextInput(attrs={
             'class': 'w-full px-4 py-3 border border-black rounded-none text-black placeholder-gray-500 focus:outline-none focus:border-black',
-            'placeholder': 'State/Province'
+            'placeholder': _('State/Province')
         })
     )
     postal_code = forms.CharField(
@@ -80,7 +81,7 @@ class OrderForm(forms.Form):
         required=True,
         widget=forms.TextInput(attrs={
             'class': 'w-full px-4 py-3 border border-black rounded-none text-black placeholder-gray-500 focus:outline-none focus:border-black',
-            'placeholder': 'Postal Code'
+            'placeholder': _('Postal Code')
         })
     )
     phone = forms.CharField(
@@ -88,10 +89,9 @@ class OrderForm(forms.Form):
         required=False,
         widget=forms.TextInput(attrs={
             'class': 'w-full px-4 py-3 border border-black rounded-none text-black placeholder-gray-500 focus:outline-none focus:border-black pr-10',
-            'placeholder': 'Phone (optional)'
+            'placeholder': _('Phone (optional)')
         })
     )
-
 
     def __init__(self, *args, user=None, **kwargs):
         super().__init__(*args, **kwargs)
@@ -109,10 +109,9 @@ class OrderForm(forms.Form):
             self.fields['postal_code'].initial = user.postal_code
             self.fields['phone'].initial = user.phone
 
-
     def clean(self):
         cleaned_data = super().clean()
-        for field in ['company', 'address1', 'address2', 'city', 
+        for field in ['company', 'address1', 'address2', 'city',
                       'country', 'province', 'postal_code', 'phone']:
             if cleaned_data.get(field):
                 cleaned_data[field] = strip_tags(cleaned_data[field])

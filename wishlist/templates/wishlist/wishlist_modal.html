@@ -1,11 +1,13 @@
-<div id="wishlist-container">
+{% load i18n %}
+<div id="wishlist-container"
+     data-error-add-to-cart="{% trans 'Error adding to cart' %}">
   <div id="wishlist-modal" class="fixed right-0 top-0 h-screen w-full max-w-md bg-white shadow-2xl z-50 transition-transform duration-300">
     <div class="h-full flex flex-col">
       
       <!-- Header -->
       <div class="flex justify-between items-center p-6 border-b">
         <h1 class="text-2xl font-bold">
-          WISHLIST (<span id="wishlist-count">{{ wishlist_count }}</span>)
+          {% trans "WISHLIST" %} (<span id="wishlist-count">{{ wishlist_count }}</span>)
         </h1>
         <button onclick="closeWishlistModal()" class="text-2xl hover:text-gray-600">×</button>
       </div>
@@ -18,11 +20,10 @@
           </div>
         {% else %}
           <div class="h-full flex flex-col items-center justify-start text-center text-gray-500 pt-20 mt-10">
-            <p class="mb-4 text-lg">Your wishlist is empty</p>
+            <p class="mb-4 text-lg">{% trans "Your wishlist is empty" %}</p>
             <button onclick="closeWishlistModal()" class="text-sm underline">
-                Continue browsing
+                {% trans "Continue browsing" %}
             </button>
-
           </div>
         {% endif %}
       </div>
@@ -37,7 +38,7 @@
             hx-swap="innerHTML"
             hx-on="htmx:afterSwap: updateWishlistCountManually"
             class="w-full block bg-black text-white py-3 px-6 text-sm font-medium text-center uppercase hover:bg-gray-800 transition-colors">
-            Clear Wishlist
+            {% trans "Clear Wishlist" %}
         </button>
       </div>
       {% endif %}
@@ -49,12 +50,14 @@
   <div id="wishlist-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-40 transition-all duration-300" onclick="closeWishlistModal()"></div>
 </div>
 
-
 <script>
 function addWishlistItemToCart(productSlug, sizeId) {
     const formData = new FormData();
     formData.append('size_id', sizeId);
     formData.append('quantity', 1);
+
+    const container = document.getElementById('wishlist-container');
+    const TEXT_ERROR_ADD = container?.dataset.errorAddToCart || 'Error adding to cart';
 
     fetch(`/cart/add/${productSlug}/`, {
         method: 'POST',
@@ -73,13 +76,12 @@ function addWishlistItemToCart(productSlug, sizeId) {
                 swap: 'innerHTML'
             });
         } else {
-            showNotification(data.error || 'Error adding to cart');
+            showNotification(data.error || TEXT_ERROR_ADD);
         }
     })
     .catch(error => {
         console.error('Add to cart error:', error);
-        showNotification('Error adding to cart');
+        showNotification(TEXT_ERROR_ADD);
     });
 }
 </script>
-

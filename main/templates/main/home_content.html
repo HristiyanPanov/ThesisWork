@@ -1,14 +1,18 @@
+{% load i18n %}
+
 <div class="outfit-wrapper">
 
     <!-- FOR HER -->
     <section class="outfit-section">
-        <h2 class="outfit-title">FOR HER</h2>
+        <h2 class="outfit-title">{% trans "FOR HER" %}</h2>
         <div class="outfit-grid">
             {% for outfit in female_outfits %}
                 <div class="outfit-card">
                     <div class="outfit-image-wrapper">
                         <img src="{{ outfit.image.url }}" alt="{{ outfit.title }}" class="outfit-image">
-                        <a href="#" class="get-look-btn" data-outfit-id="{{ outfit.id }}">GET THE LOOK</a>
+                        <a href="#" class="get-look-btn" data-outfit-id="{{ outfit.id }}">
+                          {% trans "GET THE LOOK" %}
+                        </a>
                     </div>
                 </div>
             {% endfor %}
@@ -17,13 +21,13 @@
 
     <!-- FOR HIM -->
     <section class="outfit-section">
-        <h2 class="outfit-title">FOR HIM</h2>
+        <h2 class="outfit-title">{% trans "FOR HIM" %}</h2>
         <div class="outfit-grid">
             {% for outfit in male_outfits %}
                 <div class="outfit-card">
                     <div class="outfit-image-wrapper">
                         <img src="{{ outfit.image.url }}" alt="{{ outfit.title }}" class="outfit-image">
-                        <a href="#" class="get-look-btn" data-outfit-id="{{ outfit.id }}">GET THE LOOK</a>
+                        <a href="#" class="get-look-btn" data-outfit-id="{{ outfit.id }}">{% trans "GET THE LOOK" %}</a>
                     </div>
                 </div>
             {% endfor %}
@@ -33,14 +37,17 @@
 </div>
 
 <div class="newsletter-section">
-  <h2 class="newsletter-title">-10% OFF WHEN YOU SUBSCRIBE TO OUR NEWSLETTER</h2>
+  <h2 class="newsletter-title">{% trans "-10% OFF WHEN YOU SUBSCRIBE TO OUR NEWSLETTER" %}</h2>
   <p class="newsletter-subtitle">
-    Enter your email and receive a discount code directly in your inbox
+    {% trans "Enter your email and receive a discount code directly in your inbox" %}
   </p>
 
+  {% translate "EMAIL" as EMAIL_PLACEHOLDER %}
+  {% translate "Subscribe" as SUBSCRIBE_LABEL %}
+
   <form id="newsletter-form" class="newsletter-form">
-    <input type="email" name="email" placeholder="E-MAIL" required class="newsletter-input">
-    <button type="submit" class="newsletter-submit">Subscribe</button>
+    <input type="email" name="email" placeholder="{{ EMAIL_PLACEHOLDER }}" required class="newsletter-input">
+    <button type="submit" class="newsletter-submit">{{ SUBSCRIBE_LABEL }}</button>
   </form>
 
   <div id="newsletter-message" class="newsletter-message"></div>
@@ -55,6 +62,7 @@
     <button class="modal-close-btn" id="modal-close">×</button>
   </div>
 </div>
+
 
 
 
@@ -170,7 +178,7 @@
         }
     }
 
-    .add-to-cart-btn {
+    .gtl-add-btn {
       width: 100%;
       padding: 12px;
       background: #eee;
@@ -297,13 +305,20 @@
 
 </style>
 
-
+<script src="{% url 'javascript-catalog' %}"></script>
 
 <script>
 (function () {
   // предотвратяваме двойна инициализация
   if (window.__getLookDelegated__) return;
   window.__getLookDelegated__ = true;
+
+  // ---- i18n helpers (fallback ако catalog не е зареден) ----
+  const _  = (typeof gettext !== 'undefined') ? gettext : (s)=>s;
+  const _n = (typeof ngettext !== 'undefined') ? ngettext : (s,p,n)=> (n===1?s:p);
+  const __ = (fmt, obj) => (typeof interpolate !== 'undefined')
+    ? interpolate(fmt, obj, true)   // <-- важният 3-ти аргумент
+    : fmt.replace(/%\((\w+)\)s/g, (_, k) => obj[k]);
 
   function getCookie(name) {
     let cookieValue = null;
@@ -357,22 +372,24 @@
         const closeBtn = document.getElementById('modal-close');
         if (closeBtn) closeBtn.addEventListener('click', closeModal);
 
-        // логика за бутона ADD TO CART вътре в модала
-        const addToCartBtn = document.getElementById('add-to-cart-btn');
-        const sizeSelects = document.querySelectorAll('.product-size-select');
+        // --- FIX: намери контролите в МОДАЛА и ги държи в обхват ---
+        const addToCartBtn = document.getElementById('gtl-add-btn');
+        const sizeSelects  = document.querySelectorAll('.product-size-select');
 
         function updateAddButton() {
           let selected = 0;
           sizeSelects.forEach(s => { if (s.value) selected++; });
           if (!addToCartBtn) return;
+
           if (selected === 0) {
             addToCartBtn.disabled = true;
             addToCartBtn.classList.remove('active');
-            addToCartBtn.textContent = 'ADD TO CART';
+            addToCartBtn.textContent = _('ADD TO CART');
           } else {
             addToCartBtn.disabled = false;
             addToCartBtn.classList.add('active');
-            addToCartBtn.textContent = `ADD ${selected} ITEM${selected > 1 ? 'S' : ''} TO CART`;
+            const label = ngettext('ADD %(count)s ITEM TO CART','ADD %(count)s ITEMS TO CART', selected);
+            addToCartBtn.textContent = __(label, { count: selected });
           }
         }
         sizeSelects.forEach(s => s.addEventListener('change', updateAddButton));
@@ -387,25 +404,23 @@
 
             fetch('/add-outfit-to-cart/', {
               method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': getCookie('csrftoken')
-              },
+              headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCookie('csrftoken') },
               body: JSON.stringify({ products: selectedItems })
             })
-              .then(r => r.json())
-              .then(data => {
-                if (data.success) {
-                  closeModal();
-                  if (window.htmx) {
-                    htmx.ajax('GET', '/cart/', { target: '#cart-container', swap: 'innerHTML' });
-                  }
-                  if (window.updateHeaderCartCount) window.updateHeaderCartCount(data.cart_count);
-                  if (window.showNotification) window.showNotification(`${data.added_count} item${data.added_count > 1 ? 's' : ''} added to cart`);
-                } else {
-                  alert(data.error || 'Something went wrong.');
+            .then(r => r.json())
+            .then(data => {
+              if (data.success) {
+                closeModal();
+                if (window.htmx) htmx.ajax('GET', '/cart/', { target: '#cart-container', swap: 'innerHTML' });
+                if (window.updateHeaderCartCount) window.updateHeaderCartCount(data.cart_count);
+                if (window.showNotification) {
+                  const msg = ngettext('%(count)s item added to cart','%(count)s items added to cart', data.added_count);
+                  window.showNotification(__(msg, { count: data.added_count }));
                 }
-              });
+              } else {
+                alert(data.error || _('Something went wrong.'));
+              }
+            });
           });
         }
       });
@@ -438,14 +453,14 @@
         if (!message) return;
         if (data.success) {
           if (data.new) {
-            message.textContent = "✅ Successfully subscribed! Check your email for the code.";
+            message.textContent = _('✅ Successfully subscribed! Check your email for the code.');
             message.style.color = "green";
           } else {
-            message.textContent = "ℹ️ You are already subscribed. Check your inbox for the code.";
+            message.textContent = _('ℹ️ You are already subscribed. Check your inbox for the code.');
             message.style.color = "#444";
           }
         } else {
-          message.textContent = "❌ Please enter a valid email.";
+          message.textContent = _('❌ Please enter a valid email.');
           message.style.color = "red";
         }
       });
@@ -454,55 +469,54 @@
 })();
 
 // направи функцията глобална, за да я вижда inline onclick в модала
-  window.navigateToProduct = async function (slug) {
-    const modal = document.getElementById('get-look-modal');
-    const modalContent = document.getElementById('modal-content');
-    if (!modal || !modalContent) return;
+window.navigateToProduct = async function (slug) {
+  const modal = document.getElementById('get-look-modal');
+  const modalContent = document.getElementById('modal-content');
+  if (!modal || !modalContent) return;
 
-    // анимация за затваряне
-    modal.classList.add('fade-out');
+  // анимация за затваряне
+  modal.classList.add('fade-out');
 
-    setTimeout(async () => {
-      modal.style.display = 'none';
-      modal.classList.remove('fade-out');
-      modalContent.innerHTML = '';
+  setTimeout(async () => {
+    modal.style.display = 'none';
+    modal.classList.remove('fade-out');
+    modalContent.innerHTML = '';
 
-      const url = `/product/${slug}/`;
+    const url = `/product/${slug}/`;
 
-      try {
-        // Зареждаме ПЪЛНАТА страница (без HX-Request)
-        const res = await fetch(url, { credentials: 'same-origin' });
-        if (!res.ok) throw new Error('HTTP ' + res.status);
+    try {
+      // Зареждаме ПЪЛНАТА страница (без HX-Request)
+      const res = await fetch(url, { credentials: 'same-origin' });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
 
-        const html = await res.text();
-        const doc  = new DOMParser().parseFromString(html, 'text/html');
+      const html = await res.text();
+      const doc  = new DOMParser().parseFromString(html, 'text/html');
 
-        // Вземаме #main-content от върнатия HTML
-        const newMain = doc.querySelector('#main-content');
-        const curMain = document.querySelector('#main-content');
-        if (newMain && curMain) {
-          curMain.innerHTML = newMain.innerHTML;
+      // Вземаме #main-content от върнатия HTML
+      const newMain = doc.querySelector('#main-content');
+      const curMain = document.querySelector('#main-content');
+      if (newMain && curMain) {
+        curMain.innerHTML = newMain.innerHTML;
 
-          if (window.runScriptsFrom) window.runScriptsFrom(curMain);
-          document.dispatchEvent(new CustomEvent('htmx:afterSwap',   { detail:{ target: curMain, elt: curMain }}));
-          document.dispatchEvent(new CustomEvent('htmx:afterSettle', { detail:{ target: curMain, elt: curMain }}));
-        }
-
-        // Обновяваме заглавието и URL-а
-        document.title = doc.title || document.title;
-        history.pushState({ url }, '', url);
-
-        // по желание: скрол до началото
-        window.scrollTo({ top: 0, behavior: 'instant' });
-      } catch (e) {
-        // Фолбек – класическа навигация
-        window.location.assign(url);
+        if (window.runScriptsFrom) window.runScriptsFrom(curMain);
+        document.dispatchEvent(new CustomEvent('htmx:afterSwap',   { detail:{ target: curMain, elt: curMain }}));
+        document.dispatchEvent(new CustomEvent('htmx:afterSettle', { detail:{ target: curMain, elt: curMain }}));
       }
-    }, 300);
-  };
 
+      // Обновяваме заглавието и URL-а
+      document.title = doc.title || document.title;
+      history.pushState({ url }, '', url);
 
+      // по желание: скрол до началото
+      window.scrollTo({ top: 0, behavior: 'instant' });
+    } catch (e) {
+      // Фолбек – класическа навигация
+      window.location.assign(url);
+    }
+  }, 300);
+};
 </script>
+
 
 
 

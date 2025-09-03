@@ -1,8 +1,9 @@
+{% load i18n %}
 <div class="relative inline-block">
     <input type="text" 
            id="search-input" 
            name="q" 
-           placeholder="SEARCH" 
+           placeholder="{% trans 'SEARCH' %}" 
            value="{{ search_query|default:'' }}"
            class="w-40 bg-white border border-gray-300 py-2 px-3 text-sm font-medium uppercase focus:outline-none focus:border-gray-900"
            hx-get="{% url 'main:catalog_all' %}" 
@@ -14,11 +15,13 @@
             hx-get="{% url 'main:catalog_all' %}?reset_search=true" 
             hx-target="#search-wrapper, #mobile-search-wrapper"
             hx-swap="innerHTML"
-            hx-on::before-request="document.getElementById('search-input').value = ''; document.getElementById('search-input').placeholder = 'SEARCH';">
+            hx-on::before-request="document.getElementById('search-input').value = ''; document.getElementById('search-input').placeholder = '{% trans 'SEARCH' %}';">
         ×
     </button>
 </div>
 
+
+<script src="{% url 'javascript-catalog' %}"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const searchInput = document.getElementById('search-input');
@@ -27,7 +30,7 @@
                 if (this.value) {
                     this.placeholder = '';
                 } else {
-                    this.placeholder = 'SEARCH';
+                    this.placeholder = gettext('SEARCH');
                 }
             });
             searchInput.focus();

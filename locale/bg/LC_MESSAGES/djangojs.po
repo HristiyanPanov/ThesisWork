@@ -1,0 +1,145 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-09-04 01:07+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: .\main\templates\main\home_content.html:387
+msgid "ADD TO CART"
+msgstr "ДОБАВИ В КОЛИЧКА"
+
+#: .\main\templates\main\home_content.html:391
+msgid "ADD %(count)s ITEM TO CART"
+msgid_plural "ADD %(count)s ITEMS TO CART"
+msgstr[0] "ДОБАВИ %(count)s ПРОДУКТ В КОЛИЧКАТА"
+msgstr[1] "ДОБАВИ %(count)s ПРОДУКТА В КОЛИЧКАТА"
+
+#: .\main\templates\main\home_content.html:417
+msgid "%(count)s item added to cart"
+msgid_plural "%(count)s items added to cart"
+msgstr[0] "%(count)s продукт добавен в количката"
+msgstr[1] "%(count)s продукта добавени в количката"
+
+#: .\main\templates\main\home_content.html:421
+msgid "Something went wrong."
+msgstr "Грешка"
+
+#: .\main\templates\main\home_content.html:456
+msgid "✅ Successfully subscribed! Check your email for the code."
+msgstr "✅ Успешно се абонирахте! Проверете своят мейл за кода."
+
+#: .\main\templates\main\home_content.html:459
+msgid "ℹ️ You are already subscribed. Check your inbox for the code."
+msgstr "ℹ️ Вече сте абонирани. Проверете своят мейл за кода."
+
+#: .\main\templates\main\home_content.html:463
+msgid "❌ Please enter a valid email."
+msgstr "❌ Въведете валиден мейл адрес."
+
+#: .\main\templates\main\partials\product_detail_content.html:366
+#: .\main\templates\main\partials\product_detail_content.html:395
+#: .\main\templates\main\product_detail.html:366
+#: .\main\templates\main\product_detail.html:395
+msgid "Please select a size"
+msgstr "Моля изберене размер"
+
+#: .\main\templates\main\partials\product_detail_content.html:389
+#: .\main\templates\main\product_detail.html:389
+msgid "Error adding to cart"
+msgstr "Грешка при добавяне в количка"
+
+#: .\main\templates\main\partials\product_detail_content.html:412
+#: .\main\templates\main\product_detail.html:412
+msgid "Added to wishlist"
+msgstr "Добавено в любими"
+
+#: .\main\templates\main\partials\product_detail_content.html:419
+#: .\main\templates\main\product_detail.html:419
+msgid "Something went wrong"
+msgstr "Грешка"
+
+#: .\main\templates\main\partials\product_detail_content.html:422
+#: .\main\templates\main\product_detail.html:422
+msgid "Error adding to wishlist"
+msgstr "Грешка при добавяне в любими"
+
+#: .\main\templates\main\partials\product_detail_content.html:445
+#: .\main\templates\main\product_detail.html:445
+msgid "No sizes available"
+msgstr "Няма налични размери"
+
+#: .\main\templates\main\partials\product_detail_content.html:453
+#: .\main\templates\main\product_detail.html:453
+msgid "All sizes are out of stock"
+msgstr "Всички размери не са в наличност"
+
+#: .\main\templates\main\partials\product_detail_content.html:492
+#: .\main\templates\main\product_detail.html:492
+msgid "Please select a size before adding to wishlist"
+msgstr "Моля изберете размер преди да добавите в любими"
+
+#: .\main\templates\main\partials\product_detail_content.html:554
+#: .\main\templates\main\product_detail.html:554
+msgid "Please select height and weight"
+msgstr "Моля изберете височина и тегло"
+
+#: .\main\templates\main\partials\product_detail_content.html:626
+#: .\main\templates\main\product_detail.html:626
+msgid "Recommended size: %(size)s"
+msgstr "Препоръчан размер: %(size)s"
+
+#: .\main\templates\main\search_input.html:33
+msgid "SEARCH"
+msgstr "ТЪРСИ"
+
+#: .\orders\templates\orders\checkout_content.html:228
+msgid "Please fill in all required fields"
+msgstr "Моля попълнете всички задължителни полета"
+
+#: .\orders\templates\orders\checkout_content.html:235
+msgid "Please select a valid payment provider"
+msgstr "Моля изберене валиден начин за плащане"
+
+#: .\orders\templates\orders\checkout_content.html:277
+msgid "Invalid promo code"
+msgstr "Невалиден промо код"
+
+#: .\orders\templates\orders\checkout_content.html:285
+msgid "Could not validate code"
+msgstr "Не успяхме да валидираме кода"
+
+#: .\users\templates\users\partials\order_detail.html:20
+#: .\users\templates\users\partials\profile_content.html:123
+#: .\users\templates\users\profile.html:124
+msgid "Not specified"
+msgstr "Не е уточнено"
+
+#: .\users\templates\users\partials\order_detail.html:23
+msgid "Not provided"
+msgstr "Не е дадено"
+
+#: .\users\templates\users\partials\order_detail.html:207
+msgid "Review submitted"
+msgstr "Отзивът е публикуван"
+
+#: .\users\templates\users\partials\order_detail.html:211
+msgid "Validation errors. Please check your input."
+msgstr "Грешка във валидацията. Проверете попълненото."
+
+#: .\users\templates\users\partials\order_detail.html:214
+msgid "Error: "
+msgstr "Грешка: "

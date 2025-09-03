@@ -1,7 +1,8 @@
+{% load i18n %}
 <button id="wishlist-button"
         data-url="{% url 'wishlist:modal' %}"
         data-authenticated="{{ request.user.is_authenticated|yesno:'true,false' }}"
         onclick="handleWishlistButtonClick(this)"
         class="group uppercase text-sm tracking-wider hover:text-gray-700 transition-all">
-  <span>WISHLIST (<span id="wishlist-count">{{ wishlist_count }}</span>)</span>
+  <span>{% trans "WISHLIST" %} (<span id="wishlist-count">{{ wishlist_count }}</span>)</span>
 </button>

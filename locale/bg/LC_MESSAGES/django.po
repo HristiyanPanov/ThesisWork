@@ -1,0 +1,897 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-09-04 01:17+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: bg\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: .\ThesisWork\settings.py:133
+msgid "English"
+msgstr ""
+
+#: .\ThesisWork\settings.py:134
+msgid "Bulgarian"
+msgstr ""
+
+#: .\cart\templates\cart\cart_empty.html:6
+#: .\cart\templates\cart\cart_modal.html:17
+#: .\cart\templates\cart\cart_modal.html:30
+msgid "Your cart is empty"
+msgstr "КОЛИЧКАТА Е ПРАЗНА"
+
+#: .\cart\templates\cart\cart_empty.html:7
+#: .\cart\templates\cart\cart_modal.html:18
+msgid "Continue shopping"
+msgstr "ПРОДЪЛЖИ ДА ПАЗАРУВАШ"
+
+#: .\cart\templates\cart\cart_item.html:10
+#: .\main\templates\main\catalog.html:42
+#: .\main\templates\main\partials\catalog_content.html:41
+#: .\main\templates\main\partials\product_detail_content.html:34
+#: .\main\templates\main\partials\product_detail_content.html:245
+#: .\main\templates\main\product_detail.html:35
+#: .\main\templates\main\product_detail.html:246
+#: .\users\templates\users\partials\order_detail.html:37
+#: .\wishlist\templates\wishlist\wishlist_item.html:12
+msgid "No Image"
+msgstr "НЯМА ИЗОБРАЖЕНИЕ"
+
+#: .\cart\templates\cart\cart_item.html:18
+#: .\main\templates\main\filter_modal.html:19
+#: .\wishlist\templates\wishlist\wishlist_item.html:20
+msgid "COLOR"
+msgstr "ЦВЯТ"
+
+#: .\cart\templates\cart\cart_item.html:19
+#: .\main\templates\main\filter_modal.html:45
+#: .\main\templates\main\partials\product_detail_content.html:67
+#: .\main\templates\main\partials\product_detail_content.html:89
+#: .\main\templates\main\product_detail.html:68
+#: .\main\templates\main\product_detail.html:90
+#: .\wishlist\templates\wishlist\wishlist_item.html:21
+msgid "SIZE"
+msgstr "РАЗМЕР"
+
+#: .\cart\templates\cart\cart_item.html:59
+#: .\wishlist\templates\wishlist\wishlist_item.html:40
+msgid "Remove"
+msgstr "ПРЕМАХНИ"
+
+#: .\cart\templates\cart\cart_modal.html:6
+#: .\cart\templates\cart\includes\cart_button.html:5
+#: .\main\templates\main\base.html:248 .\main\templates\main\base.html:253
+#: .\main\templates\main\base.html:347 .\main\templates\main\base.html:525
+msgid "CART"
+msgstr "КОЛИЧКА"
+
+#: .\cart\templates\cart\cart_summary.html:4
+msgid "SUBTOTAL:"
+msgstr "ОБЩА СУМА"
+
+#: .\cart\templates\cart\cart_summary.html:10
+msgid "Checkout"
+msgstr "ПРОДЪЛЖИ"
+
+#: .\main\templates\main\base.html:235 .\main\templates\main\base.html:325
+#: .\main\templates\main\search_button.html:7
+#: .\main\templates\main\search_input.html:6
+#: .\main\templates\main\search_input.html:18
+msgid "SEARCH"
+msgstr "ТЪРСЕНЕ"
+
+#: .\main\templates\main\base.html:243 .\main\templates\main\base.html:331
+#: .\users\templates\users\order_detail.html:23
+#: .\users\templates\users\order_history.html:23
+#: .\users\templates\users\partials\profile_content.html:50
+#: .\users\templates\users\profile.html:51
+msgid "ACCOUNT"
+msgstr "ПРОФИЛ"
+
+#: .\main\templates\main\base.html:297
+#: .\main\templates\main\partials\product_detail_content.html:11
+#: .\main\templates\main\product_detail.html:12
+#: .\orders\templates\orders\checkout_content.html:15
+msgid "HOME"
+msgstr "НАЧАЛО"
+
+#: .\main\templates\main\base.html:341
+#: .\wishlist\templates\wishlist\includes\wishlist_button.html:7
+#: .\wishlist\templates\wishlist\wishlist_modal.html:10
+msgid "WISHLIST"
+msgstr "ЛЮБИМИ"
+
+#: .\main\templates\main\catalog.html:8
+#: .\main\templates\main\partials\catalog_content.html:7
+msgid "NEW ARRIVALS"
+msgstr "НОВИ ПОПЪЛНЕНИЯ"
+
+#: .\main\templates\main\catalog.html:10
+#: .\main\templates\main\partials\catalog_content.html:9
+msgid "ALL PRODUCTS"
+msgstr "ВСИЧКИ ПРОДУКТИ"
+
+#: .\main\templates\main\catalog.html:18
+#: .\main\templates\main\partials\catalog_content.html:17
+msgid "FILTERS"
+msgstr "ФИЛТРИ"
+
+#: .\main\templates\main\catalog.html:56
+#: .\main\templates\main\partials\catalog_content.html:55
+msgid "No products found"
+msgstr "Няма намерени продукти"
+
+#: .\main\templates\main\catalog.html:59
+#: .\main\templates\main\partials\catalog_content.html:58
+msgid "No products available in this category yet."
+msgstr "Няма продукти в тази категория"
+
+#: .\main\templates\main\catalog.html:61
+#: .\main\templates\main\partials\catalog_content.html:60
+msgid "No products available at the moment."
+msgstr "В момента няма достъпни продукти"
+
+#: .\main\templates\main\catalog.html:69
+#: .\main\templates\main\partials\catalog_content.html:68
+msgid "Back to Home"
+msgstr "Назад към главна страница"
+
+#: .\main\templates\main\filter_modal.html:4
+msgid "Filters"
+msgstr "Филтри"
+
+#: .\main\templates\main\filter_modal.html:28
+msgid "PRICE RANGE"
+msgstr "ЦЕНОВИ ДИАПАЗОН"
+
+#: .\main\templates\main\filter_modal.html:33
+msgid "Min"
+msgstr "Мин"
+
+#: .\main\templates\main\filter_modal.html:38
+msgid "Max"
+msgstr "Макс"
+
+#: .\main\templates\main\filter_modal.html:47
+msgid "Any Size"
+msgstr "Избери"
+
+#: .\main\templates\main\filter_modal.html:61
+#: .\users\templates\users\partials\edit_account_details.html:115
+msgid "Cancel"
+msgstr "Затвори"
+
+#: .\main\templates\main\filter_modal.html:65
+msgid "Apply Filters"
+msgstr "Приложи филтрите"
+
+#: .\main\templates\main\get_the_look_modal.html:17
+#: .\main\templates\main\home_content.html:14
+#: .\main\templates\main\home_content.html:30
+msgid "GET THE LOOK"
+msgstr "ВЗЕМИ ОБЛЕКЛОТО"
+
+#: .\main\templates\main\get_the_look_modal.html:30
+msgid "Select Size"
+msgstr "Избери размер"
+
+#: .\main\templates\main\get_the_look_modal.html:39
+#: .\main\templates\main\partials\product_detail_content.html:149
+#: .\main\templates\main\product_detail.html:150
+msgid "ADD TO CART"
+msgstr "ДОБАВИ В КОЛИЧКАТА"
+
+#: .\main\templates\main\home_content.html:7
+msgid "FOR HER"
+msgstr "ЗА НЕЯ"
+
+#: .\main\templates\main\home_content.html:24
+msgid "FOR HIM"
+msgstr "ЗА НЕГО"
+
+#: .\main\templates\main\home_content.html:40
+#, python-format
+msgid "-10%% OFF WHEN YOU SUBSCRIBE TO OUR NEWSLETTER"
+msgstr "-10%% ОТСТЪПКА КАТО СЕ АБОНИРАШ ЗА НАШИЯТ БЮЛЕТИН"
+
+#: .\main\templates\main\home_content.html:42
+msgid "Enter your email and receive a discount code directly in your inbox"
+msgstr "Въведи своят мейл адрес и получи код за отстъпка"
+
+#: .\main\templates\main\home_content.html:45 .\users\forms.py:14
+#: .\users\forms.py:48 .\users\forms.py:86 .\users\forms.py:110
+msgid "EMAIL"
+msgstr "МЕЙЛ"
+
+#: .\main\templates\main\home_content.html:46
+msgid "Subscribe"
+msgstr "Абонирай се"
+
+#: .\main\templates\main\partials\product_detail_content.html:90
+#: .\main\templates\main\product_detail.html:91
+msgid "No sizes available"
+msgstr "Няма наличен размер"
+
+#: .\main\templates\main\partials\product_detail_content.html:96
+#: .\main\templates\main\product_detail.html:97
+msgid "Find My Size"
+msgstr "Намери своя размер"
+
+#: .\main\templates\main\partials\product_detail_content.html:100
+#: .\main\templates\main\product_detail.html:101
+msgid "Height (cm)"
+msgstr "Височина (см)"
+
+#: .\main\templates\main\partials\product_detail_content.html:102
+#: .\main\templates\main\product_detail.html:103
+msgid "Select height"
+msgstr "Избери височина"
+
+#: .\main\templates\main\partials\product_detail_content.html:106
+#: .\main\templates\main\product_detail.html:107
+msgid "Weight (kg)"
+msgstr "Килограми (кг)"
+
+#: .\main\templates\main\partials\product_detail_content.html:108
+#: .\main\templates\main\product_detail.html:109
+msgid "Select weight"
+msgstr "Избери килограми"
+
+#: .\main\templates\main\partials\product_detail_content.html:116
+#: .\main\templates\main\product_detail.html:117
+msgid "Waist (cm)"
+msgstr "Талия (см)"
+
+#: .\main\templates\main\partials\product_detail_content.html:116
+#: .\main\templates\main\partials\product_detail_content.html:124
+#: .\main\templates\main\product_detail.html:117
+#: .\main\templates\main\product_detail.html:125
+msgid "(optional)"
+msgstr "(по избор)"
+
+#: .\main\templates\main\partials\product_detail_content.html:124
+#: .\main\templates\main\product_detail.html:125
+msgid "Hips (cm)"
+msgstr "Ханш (см)"
+
+#: .\main\templates\main\partials\product_detail_content.html:133
+#: .\main\templates\main\product_detail.html:134
+msgid "Calculate Size"
+msgstr "Изчисли размер"
+
+#: .\main\templates\main\partials\product_detail_content.html:138
+#: .\main\templates\main\product_detail.html:139
+msgid "Recommended size:"
+msgstr "Препоръчан размер:"
+
+#: .\main\templates\main\partials\product_detail_content.html:159
+#: .\main\templates\main\partials\product_detail_content.html:168
+#: .\main\templates\main\product_detail.html:160
+#: .\main\templates\main\product_detail.html:169
+msgid "ADD TO WISHLIST"
+msgstr "ДОБАВИ В ЛЮБИМИ"
+
+#: .\main\templates\main\partials\product_detail_content.html:181
+#: .\main\templates\main\product_detail.html:182
+msgid "DETAILS"
+msgstr "ДЕТАЙЛИ"
+
+#: .\main\templates\main\partials\product_detail_content.html:184
+#: .\main\templates\main\product_detail.html:185
+msgid "Created:"
+msgstr "Създадено на:"
+
+#: .\main\templates\main\partials\product_detail_content.html:190
+#: .\main\templates\main\product_detail.html:191
+msgid "CARE"
+msgstr "Грижа"
+
+#: .\main\templates\main\partials\product_detail_content.html:192
+#: .\main\templates\main\product_detail.html:193
+msgid "Professional dry clean only"
+msgstr "Химическо чистене"
+
+#: .\main\templates\main\partials\product_detail_content.html:193
+#: .\main\templates\main\product_detail.html:194
+msgid "Do not bleach"
+msgstr "Не избелвай"
+
+#: .\main\templates\main\partials\product_detail_content.html:194
+#: .\main\templates\main\product_detail.html:195
+msgid "Iron at low temperature"
+msgstr "Глади на ниска температура"
+
+#: .\main\templates\main\partials\product_detail_content.html:201
+#: .\main\templates\main\product_detail.html:202
+msgid "CUSTOMER REVIEWS"
+msgstr "Отзиви от купувачи"
+
+#: .\main\templates\main\partials\product_detail_content.html:231
+#: .\main\templates\main\product_detail.html:232
+#: .\users\templates\users\partials\profile_content.html:145
+#: .\users\templates\users\profile.html:146
+msgid "YOU MAY ALSO LIKE"
+msgstr "МОЖЕ ДА ХАРЕСАТЕ"
+
+#: .\orders\forms.py:12 .\orders\templates\orders\checkout_content.html:57
+msgid "First Name"
+msgstr "Име"
+
+#: .\orders\forms.py:20 .\orders\templates\orders\checkout_content.html:64
+msgid "Last Name"
+msgstr "Фамилия"
+
+#: .\orders\forms.py:27 .\orders\templates\orders\checkout_content.html:31
+#: .\users\forms.py:48
+msgid "Email"
+msgstr "МЕЙЛ"
+
+#: .\orders\forms.py:36
+msgid "Company (optional)"
+msgstr "Фирма (по избор)"
+
+#: .\orders\forms.py:44
+msgid "Address Line 1"
+msgstr "Адрес 1"
+
+#: .\orders\forms.py:52
+msgid "Address Line 2 (optional)"
+msgstr "Адрес 2 (по избор)"
+
+#: .\orders\forms.py:60 .\orders\templates\orders\checkout_content.html:87
+msgid "City"
+msgstr "Град"
+
+#: .\orders\forms.py:68
+msgid "Country"
+msgstr "Държава"
+
+#: .\orders\forms.py:76 .\orders\templates\orders\checkout_content.html:91
+msgid "State/Province"
+msgstr "Област"
+
+#: .\orders\forms.py:84 .\orders\templates\orders\checkout_content.html:95
+msgid "Postal Code"
+msgstr "Пощенски код"
+
+#: .\orders\forms.py:92
+msgid "Phone (optional)"
+msgstr "Телефон (по избор)"
+
+#: .\orders\templates\orders\checkout_content.html:17
+msgid "CHECKOUT"
+msgstr "ЗАВЪРШВАНЕ НА ПОРЪЧКА"
+
+#: .\orders\templates\orders\checkout_content.html:23
+msgid "Contact Information"
+msgstr "Информация за връзка"
+
+#: .\orders\templates\orders\checkout_content.html:39
+msgid "Send me news and offers"
+msgstr "Изпращайте ми новини и оферти"
+
+#: .\orders\templates\orders\checkout_content.html:46
+msgid "Shipping Address"
+msgstr "Адрес за доставка"
+
+#: .\orders\templates\orders\checkout_content.html:49
+msgid "Country/Region"
+msgstr "Държава"
+
+#: .\orders\templates\orders\checkout_content.html:72
+msgid "Address"
+msgstr "Адрес"
+
+#: .\orders\templates\orders\checkout_content.html:79
+msgid "Apartment, suite, etc. (optional)"
+msgstr "Адрес 2 (по избор)"
+
+#: .\orders\templates\orders\checkout_content.html:100
+msgid "Phone"
+msgstr "Телефон"
+
+#: .\orders\templates\orders\checkout_content.html:106
+msgid "Save information for next time"
+msgstr "Запази информацията за следващият път "
+
+#: .\orders\templates\orders\checkout_content.html:120
+msgid "Pay with Stripe"
+msgstr "Плати със Stripe"
+
+#: .\orders\templates\orders\checkout_content.html:128
+msgid "Refund Policy"
+msgstr "Политика за връщане"
+
+#: .\orders\templates\orders\checkout_content.html:156
+#, python-format
+msgid "Subtotal • %(count)s item"
+msgid_plural "Subtotal • %(count)s items"
+msgstr[0] "Общо • %(count)s продукт"
+msgstr[1] "Общо • %(count)s продукта"
+
+#: .\orders\templates\orders\checkout_content.html:161
+#: .\orders\templates\orders\partials\summary.html:16
+msgid "Shipping"
+msgstr "Доставка"
+
+#: .\orders\templates\orders\checkout_content.html:162
+#: .\orders\templates\orders\partials\summary.html:17
+msgid "Enter shipping address"
+msgstr "Въведи адрес за доставка"
+
+#: .\orders\templates\orders\checkout_content.html:166
+msgid "Promo Code"
+msgstr "Промо код"
+
+#: .\orders\templates\orders\checkout_content.html:170
+msgid "Enter code"
+msgstr "Въведи код"
+
+#: .\orders\templates\orders\checkout_content.html:173
+msgid "Apply"
+msgstr "Приложи"
+
+#: .\orders\templates\orders\checkout_content.html:179
+msgid "Discount"
+msgstr "Отстъпка"
+
+#: .\orders\templates\orders\checkout_content.html:183
+msgid "Invalid promo code."
+msgstr "Невалиден промо код"
+
+#: .\orders\templates\orders\checkout_content.html:186
+#: .\orders\templates\orders\partials\summary.html:30
+msgid "Total"
+msgstr "Обща сума:"
+
+#: .\orders\templates\orders\checkout_content.html:188
+#: .\orders\templates\orders\partials\summary.html:32
+msgid "EUR"
+msgstr "Евро"
+
+#: .\orders\templates\orders\empty_cart.html:10
+#: .\payment\templates\payment\stripe_success_content.html:17
+msgid "Continue Shopping"
+msgstr "ПРОДЪЛЖИ ДА ПАЗАРУВАШ"
+
+#: .\orders\templates\orders\partials\summary.html:6
+#, python-format
+msgid ""
+"\n"
+"                Total • %(count)s item\n"
+"            "
+msgid_plural ""
+"\n"
+"                Total • %(count)s items\n"
+"            "
+msgstr[0] ""
+"\n"
+"                Общо • %(count)s продукт\n"
+"            "
+msgstr[1] ""
+"\n"
+"                Общо • %(count)s продукта\n"
+"            "
+
+#: .\orders\templates\orders\partials\summary.html:23
+#, python-format
+msgid "Discount (%(percent)s%%)"
+msgstr "Отстъпка (%(percent)s%%)"
+
+#: .\payment\templates\payment\stripe_cancel.html:4
+msgid "Order Cancelled"
+msgstr "Поръчката е отказана"
+
+#: .\payment\templates\payment\stripe_cancel_content.html:4
+msgid "Order cancelled"
+msgstr "Поръчката е отказана"
+
+#: .\payment\templates\payment\stripe_cancel_content.html:6
+#, python-format
+msgid ""
+"\n"
+"                Your order #%(order_id)s was cancelled.\n"
+"            "
+msgstr ""
+"\n"
+"                Поръчка #%(order_id)s беше отказана.\n"
+"            "
+
+#: .\payment\templates\payment\stripe_cancel_content.html:15
+msgid "Return to checkout"
+msgstr "Върни се към завършването"
+
+#: .\payment\templates\payment\stripe_success.html:4
+msgid "Order Successfully Placed"
+msgstr "Поръчката е успешно направена"
+
+#: .\payment\templates\payment\stripe_success_content.html:4
+msgid "Thank You for Your Order!"
+msgstr "Благодарим Ви за вашата поръчка!"
+
+#: .\payment\templates\payment\stripe_success_content.html:6
+#, python-format
+msgid ""
+"\n"
+"                Your order #%(order_id)s has been successfully placed.\n"
+"            "
+msgstr ""
+"\n"
+"                Вашата поръчка #%(order_id)s беше успешно направена.\n"
+"            "
+
+#: .\payment\templates\payment\stripe_success_content.html:11
+#, python-format
+msgid ""
+"\n"
+"                We'll send a confirmation to <strong>%(order_email)s</"
+"strong> soon.\n"
+"            "
+msgstr ""
+"\n"
+"                Ще изпратим потвърждение на <strong>%(order_email)s</strong> "
+"скоро.\n"
+"            "
+
+#: .\users\forms.py:15 .\users\forms.py:77
+msgid "FIRST NAME"
+msgstr "ИМЕ"
+
+#: .\users\forms.py:16 .\users\forms.py:82
+msgid "LAST NAME"
+msgstr "ФАМИЛИЯ"
+
+#: .\users\forms.py:19 .\users\forms.py:51
+msgid "PASSWORD"
+msgstr "ПАРОЛА"
+
+#: .\users\forms.py:23 .\users\forms.py:123
+msgid "CONFIRM PASSWORD"
+msgstr "ПОТВЪРДИ ПАРОЛА"
+
+#: .\users\forms.py:35
+msgid "This email is already in use."
+msgstr "Този мейл вече се използва"
+
+#: .\users\forms.py:50
+msgid "Password"
+msgstr "ПАРОЛА"
+
+#: .\users\forms.py:62
+msgid "Invalid email or password."
+msgstr "Невалиден мейл или парола"
+
+#: .\users\forms.py:64
+msgid "This account is inactive."
+msgstr "Този акаунт не е активен"
+
+#: .\users\forms.py:71
+msgid "Enter a valid phone number."
+msgstr "Въведете валиден телефонен номер"
+
+#: .\users\forms.py:72
+msgid "PHONE NUMBER"
+msgstr "ТЕЛЕФОНЕН НОМЕР"
+
+#: .\users\forms.py:96
+msgid "COMPANY"
+msgstr "ФИРМА"
+
+#: .\users\forms.py:97
+msgid "ADDRESS LINE 1"
+msgstr "АДРЕС 1"
+
+#: .\users\forms.py:98
+msgid "ADDRESS LINE 2"
+msgstr "АДРЕС 2"
+
+#: .\users\forms.py:99
+msgid "CITY"
+msgstr "ГРАД"
+
+#: .\users\forms.py:100
+msgid "COUNTRY"
+msgstr "СТРАНА"
+
+#: .\users\forms.py:101
+msgid "PROVINCE"
+msgstr "ОБЛАСТ"
+
+#: .\users\forms.py:102
+msgid "POSTAL CODE"
+msgstr "ПОЩЕНСКИ КОД"
+
+#: .\users\forms.py:118
+msgid "New password"
+msgstr "Нова парола"
+
+#: .\users\forms.py:119
+msgid "NEW PASSWORD"
+msgstr "НОВА ПАРОЛА"
+
+#: .\users\forms.py:122
+msgid "Confirm password"
+msgstr "Потвърди парола"
+
+#: .\users\forms.py:132
+msgid "Passwords do not match."
+msgstr "Паролите не съвпадат"
+
+#: .\users\templates\users\login.html:24 .\users\templates\users\login.html:75
+#: .\users\templates\users\partials\login_form.html:6
+#: .\users\templates\users\partials\login_form.html:57
+#: .\users\templates\users\partials\register_form.html:92
+#: .\users\templates\users\register.html:93
+msgid "Log in"
+msgstr "Влез"
+
+#: .\users\templates\users\login.html:66
+#: .\users\templates\users\partials\login_form.html:48
+#: .\users\templates\users\partials\password_reset_form.html:6
+msgid "Forgot password?"
+msgstr "Забравена парола?"
+
+#: .\users\templates\users\login.html:84
+#: .\users\templates\users\partials\login_form.html:66
+#: .\users\templates\users\partials\register_form.html:23
+#: .\users\templates\users\partials\register_form.html:83
+#: .\users\templates\users\register.html:24
+#: .\users\templates\users\register.html:84
+msgid "Create an account"
+msgstr "Създай акаунт"
+
+#: .\users\templates\users\order_detail.html:8
+msgid "HI,"
+msgstr "ЗДРАВЕЙТЕ,"
+
+#: .\users\templates\users\order_detail.html:33
+#: .\users\templates\users\order_history.html:33
+#: .\users\templates\users\partials\order_history.html:4
+#: .\users\templates\users\partials\profile_content.html:62
+#: .\users\templates\users\profile.html:63
+msgid "ORDER HISTORY"
+msgstr "ИСТОРИЯ НА ПОРЪЧКИТЕ"
+
+#: .\users\templates\users\order_detail.html:42
+#: .\users\templates\users\order_history.html:42
+#: .\users\templates\users\partials\profile_content.html:72
+#: .\users\templates\users\profile.html:73
+msgid "LOG OUT"
+msgstr "ИЗХОД"
+
+#: .\users\templates\users\order_history.html:8
+#, python-format
+msgid "HI, %(request.user.first_name|upper)s %(request.user.last_name|upper)s"
+msgstr "ЗДРАВЕЙТЕ, %(request.user.first_name|upper)s %(request.user.last_name|upper)s"
+
+#: .\users\templates\users\partials\account_details.html:4
+#: .\users\templates\users\partials\profile_content.html:118
+#: .\users\templates\users\profile.html:119
+msgid "Default Address"
+msgstr "Адрес"
+
+#: .\users\templates\users\partials\account_details.html:11
+#: .\users\templates\users\partials\order_detail.html:20
+#: .\users\templates\users\partials\profile_content.html:123
+#: .\users\templates\users\profile.html:124
+msgid "Not specified"
+msgstr "Не е уточнено"
+
+#: .\users\templates\users\partials\account_details.html:24
+#: .\users\templates\users\partials\profile_content.html:132
+#: .\users\templates\users\profile.html:133
+msgid "Edit"
+msgstr "Редактирай"
+
+#: .\users\templates\users\partials\account_details.html:30
+#: .\users\templates\users\partials\profile_content.html:136
+#: .\users\templates\users\profile.html:137
+msgid "Delete"
+msgstr "Изтрий"
+
+#: .\users\templates\users\partials\edit_account_details.html:107
+msgid "Save"
+msgstr "Съхрани"
+
+#: .\users\templates\users\partials\order_detail.html:6
+#, python-format
+msgid "ORDER #%(id)s"
+msgstr "ПОРЪЧКА #%(id)s"
+
+#: .\users\templates\users\partials\order_detail.html:10
+#: .\users\templates\users\partials\order_history.html:11
+#: .\users\templates\users\partials\profile_content.html:89
+#: .\users\templates\users\profile.html:90
+msgid "Placed on:"
+msgstr "Поръчано на:"
+
+#: .\users\templates\users\partials\order_detail.html:11
+#: .\users\templates\users\partials\order_history.html:12
+#: .\users\templates\users\partials\profile_content.html:90
+#: .\users\templates\users\profile.html:91
+msgid "Status:"
+msgstr "Статус:"
+
+#: .\users\templates\users\partials\order_detail.html:12
+msgid "Payment Provider:"
+msgstr "Начин на плащане:"
+
+#: .\users\templates\users\partials\order_detail.html:13
+#: .\users\templates\users\partials\order_history.html:13
+#: .\users\templates\users\partials\profile_content.html:91
+#: .\users\templates\users\profile.html:92
+msgid "Total:"
+msgstr "Обща сума:"
+
+#: .\users\templates\users\partials\order_detail.html:15
+msgid "Shipping Address:"
+msgstr "Адрес за доставка"
+
+#: .\users\templates\users\partials\order_detail.html:23
+msgid "Phone:"
+msgstr "Телефон"
+
+#: .\users\templates\users\partials\order_detail.html:23
+msgid "Not provided"
+msgstr "Не е дадено"
+
+#: .\users\templates\users\partials\order_detail.html:24
+msgid "Email:"
+msgstr "МЕЙЛ"
+
+#: .\users\templates\users\partials\order_detail.html:26
+msgid "Items"
+msgstr "Артикули"
+
+#: .\users\templates\users\partials\order_detail.html:63
+msgid "Size:"
+msgstr "Размер:"
+
+#: .\users\templates\users\partials\order_detail.html:65
+msgid "Quantity:"
+msgstr "Количество:"
+
+#: .\users\templates\users\partials\order_detail.html:73
+msgid "Leave a review"
+msgstr "Остави отзив"
+
+#: .\users\templates\users\partials\order_detail.html:76
+msgid "Review submitted"
+msgstr "Отзивът е оставен"
+
+#: .\users\templates\users\partials\order_detail.html:90
+msgid "BACK TO ORDER HISTORY"
+msgstr "НАЗАД КЪМ ИСТОРИЯТА НА ПОРЪЧКИТЕ"
+
+#: .\users\templates\users\partials\order_detail.html:98
+msgid "Leave a Review"
+msgstr "Остави отзив"
+
+#: .\users\templates\users\partials\order_detail.html:104
+msgid "Rating:"
+msgstr "Оценка:"
+
+#: .\users\templates\users\partials\order_detail.html:115
+msgid "Title:"
+msgstr "Заглавие:"
+
+#: .\users\templates\users\partials\order_detail.html:118
+msgid "Review:"
+msgstr "Отзив:"
+
+#: .\users\templates\users\partials\order_detail.html:122
+msgid "SUBMIT REVIEW"
+msgstr "ПУБЛИКУВАЙ ОТЗИВ"
+
+#: .\users\templates\users\partials\order_history.html:10
+#: .\users\templates\users\partials\profile_content.html:88
+#: .\users\templates\users\profile.html:89
+msgid "Order #"
+msgstr "Поръчка #"
+
+#: .\users\templates\users\partials\order_history.html:21
+msgid "VIEW DETAILS"
+msgstr "ВИЖ ДЕТАЙЛИ"
+
+#: .\users\templates\users\partials\order_history.html:26
+#: .\users\templates\users\partials\profile_content.html:100
+#: .\users\templates\users\profile.html:101
+msgid "You haven't placed any orders yet."
+msgstr "Все още нямате направени поръчки"
+
+#: .\users\templates\users\partials\order_history.html:33
+#: .\users\templates\users\partials\profile_content.html:107
+#: .\users\templates\users\profile.html:108
+msgid "SHOP NOW"
+msgstr "ПАЗАРУВАЙ"
+
+#: .\users\templates\users\partials\password_reset_form.html:31
+msgid "Send link"
+msgstr "Изпрати линк"
+
+#: .\users\templates\users\partials\password_reset_form.html:40
+msgid "Back to log in"
+msgstr "Назад към Влез"
+
+#: .\users\templates\users\partials\profile_content.html:26
+#: .\users\templates\users\profile.html:27
+#, python-format
+msgid "HI, %(first)s %(last)s"
+msgstr "ЗДРАВЕЙТЕ, %(first)s %(last)s"
+
+#: .\users\templates\users\partials\profile_content.html:85
+#: .\users\templates\users\profile.html:86
+msgid "LATEST ORDER"
+msgstr "ПОСЛЕДНА ПОРЪЧКА"
+
+#: .\users\templates\users\partials\profile_content.html:97
+#: .\users\templates\users\profile.html:98
+msgid "VIEW"
+msgstr "ВИЖ"
+
+#: .\users\templates\users\partials\profile_content.html:115
+#: .\users\templates\users\profile.html:116
+msgid "ACCOUNT DETAILS"
+msgstr "ДЕТАЙЛИ НА ПРОФИЛА"
+
+#: .\users\templates\users\partials\profile_content.html:165
+#: .\users\templates\users\profile.html:166
+msgid "CHOOSE OPTIONS"
+msgstr "ИЗБЕРИ"
+
+#: .\users\templates\users\partials\profile_content.html:169
+#: .\users\templates\users\profile.html:170
+msgid "No recommended products available at the moment."
+msgstr "Няма препоръчани продукти"
+
+#: .\users\templates\users\partials\register_form.html:74
+#: .\users\templates\users\register.html:75
+msgid "Passwords do not match"
+msgstr "Паролите не съвпадат"
+
+#: .\users\templates\users\password_reset_confirm.html:7
+msgid "Set new password"
+msgstr "Задай нова парола"
+
+#: .\users\templates\users\password_reset_confirm.html:39
+msgid "Reset password"
+msgstr "Обнови парола"
+
+#: .\wishlist\templates\wishlist\wishlist_empty.html:6
+#: .\wishlist\templates\wishlist\wishlist_modal.html:23
+msgid "Your wishlist is empty"
+msgstr "СПИСЪКЪТ С ЛЮБИМИ Е ПРАЗЕН"
+
+#: .\wishlist\templates\wishlist\wishlist_empty.html:10
+#: .\wishlist\templates\wishlist\wishlist_modal.html:25
+msgid "Continue browsing"
+msgstr "ПРОДЪЛЖИ ДА ИЗБИРАШ"
+
+#: .\wishlist\templates\wishlist\wishlist_item.html:30
+msgid "Add to Cart"
+msgstr "ДОБАВИ В КОЛИЧКАТА"
+
+#: .\wishlist\templates\wishlist\wishlist_modal.html:3
+msgid "Error adding to cart"
+msgstr "ГРЕШКА ПРИ ДОБАВЯНЕ В КОЛИЧКА"
+
+#: .\wishlist\templates\wishlist\wishlist_modal.html:41
+msgid "Clear Wishlist"
+msgstr "ИЗЧИСТИ ЛЮБИМИ"
+
+#, fuzzy
+#~| msgid "EMAIL"
+#~ msgid "E-MAIL"
+#~ msgstr "МЕЙЛ"

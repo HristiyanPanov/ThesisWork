@@ -1,6 +1,7 @@
 {% load static %}
+{% load i18n %}
 
-<main class="mx-auto px-4 sm:px-6 lg:px-8 py-8">
+<main id="product-detail-root" class="mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <!-- Breadcrumb -->
     <div class="mb-8">
         <nav class="text-sm text-gray-600">
@@ -8,7 +9,7 @@
                hx-get="{% url 'main:index' %}" 
                hx-target="#main-content" 
                hx-push-url="true"
-               class="hover:text-gray-900">HOME</a>
+               class="hover:text-gray-900">{% trans "HOME" %}</a>
             <span class="mx-2">/</span>
             <a href="{% url 'main:catalog' product.category.slug %}" 
                hx-get="{% url 'main:catalog' product.category.slug %}" 
@@ -31,7 +32,7 @@
                          class="w-full h-full object-cover">
                 {% else %}
                     <div class="w-full h-full bg-gray-200 flex items-center justify-center">
-                        <span class="text-gray-400">No Image</span>
+                        <span class="text-gray-400">{% trans "No Image" %}</span>
                     </div>
                 {% endif %}
             </div>
@@ -64,7 +65,7 @@
             <!-- Sizes -->
             {% if product.product_sizes.all %}
             <div>
-                <h3 class="text-sm font-medium text-gray-900 mb-3">SIZE</h3>
+                <h3 class="text-sm font-medium text-gray-900 mb-3">{% trans "SIZE" %}</h3>
                 <div class="grid grid-cols-4 gap-2">
                     {% for product_size in product.product_sizes.all %}
                     <div class="size-option">
@@ -86,58 +87,58 @@
             </div>
             {% else %}
             <div>
-                <h3 class="text-sm font-medium text-gray-900 mb-3">SIZE</h3>
-                <p class="text-sm text-gray-600">No sizes available</p>
+                <h3 class="text-sm font-medium text-gray-900 mb-3">{% trans "SIZE" %}</h3>
+                <p class="text-sm text-gray-600">{% trans "No sizes available" %}</p>
             </div>
             {% endif %}
 
             <!-- Find My Size -->
             <div id="find-my-size" class="mt-6 p-4 border rounded-lg bg-gray-50">
-            <h3 class="text-lg font-semibold mb-3">Find My Size</h3>
+                <h3 class="text-lg font-semibold mb-3">{% trans "Find My Size" %}</h3>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                <label class="block mb-2 text-sm font-medium">Height (cm)</label>
-                <select id="fms-height" class="w-full border rounded px-2 py-1 fms-dd">
-                    <option value="">Select height</option>
-                </select>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block mb-2 text-sm font-medium">{% trans "Height (cm)" %}</label>
+                        <select id="fms-height" class="w-full border rounded px-2 py-1 fms-dd">
+                            <option value="">{% trans "Select height" %}</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block mb-2 text-sm font-medium">{% trans "Weight (kg)" %}</label>
+                        <select id="fms-weight" class="w-full border rounded px-2 py-1 fms-dd">
+                            <option value="">{% trans "Select weight" %}</option>
+                        </select>
+                    </div>
                 </div>
-                <div>
-                <label class="block mb-2 text-sm font-medium">Weight (kg)</label>
-                <select id="fms-weight" class="w-full border rounded px-2 py-1 fms-dd">
-                    <option value="">Select weight</option>
-                </select>
-                </div>
-            </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
-                <div>
-                <label class="block mb-2 text-sm font-medium">
-                    Waist (cm) <span class="text-gray-500 text-xs">(optional)</span>
-                </label>
-                <select id="fms-waist" class="w-full border rounded px-2 py-1 fms-dd">
-                    <option value="">—</option>
-                </select>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+                    <div>
+                        <label class="block mb-2 text-sm font-medium">
+                            {% trans "Waist (cm)" %} <span class="text-gray-500 text-xs">{% trans "(optional)" %}</span>
+                        </label>
+                        <select id="fms-waist" class="w-full border rounded px-2 py-1 fms-dd">
+                            <option value="">—</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block mb-2 text-sm font-medium">
+                            {% trans "Hips (cm)" %} <span class="text-gray-500 text-xs">{% trans "(optional)" %}</span>
+                        </label>
+                        <select id="fms-hips" class="w-full border rounded px-2 py-1 fms-dd">
+                            <option value="">—</option>
+                        </select>
+                    </div>
                 </div>
-                <div>
-                <label class="block mb-2 text-sm font-medium">
-                    Hips (cm) <span class="text-gray-500 text-xs">(optional)</span>
-                </label>
-                <select id="fms-hips" class="w-full border rounded px-2 py-1 fms-dd">
-                    <option value="">—</option>
-                </select>
+
+                <button id="fms-calc" class="mt-4 w-full bg-black text-white py-2 rounded hover:bg-gray-800">
+                    {% trans "Calculate Size" %}
+                </button>
+
+                <div id="fms-result" class="mt-3 hidden">
+                    <p class="text-sm text-gray-700">
+                        {% trans "Recommended size:" %} <span id="fms-reco" class="font-bold"></span>
+                    </p>
                 </div>
-            </div>
-
-            <button id="fms-calc" class="mt-4 w-full bg-black text-white py-2 rounded hover:bg-gray-800">
-                Calculate Size
-            </button>
-
-            <div id="fms-result" class="mt-3 hidden">
-                <p class="text-sm text-gray-700">
-                Recommended size: <span id="fms-reco" class="font-bold"></span>
-                </p>
-            </div>
             </div>
 
             <!-- Buttons -->
@@ -146,17 +147,17 @@
                         data-product-slug="{{ product.slug }}"
                         class="w-full bg-black text-white py-3 px-6 text-sm font-medium hover:bg-gray-800 transition-colors"
                         {% if not product.product_sizes.all %}disabled{% endif %}>
-                ADD TO CART
+                    {% trans "ADD TO CART" %}
                 </button>
 
                 {% if not user.is_authenticated %}
                 <a href="{% url 'users:login' %}?next={{ request.path }}"
-                hx-get="{% url 'users:login' %}?next={{ request.path }}"
-                hx-target="#main-content"
-                hx-push-url="true"
-                class="w-full block bg-white text-black border border-black py-3 px-6 text-sm font-medium uppercase hover:bg-gray-100 transition-colors text-center"
-                {% if not product.product_sizes.all %}style="pointer-events: none; opacity: 0.5;"{% endif %}>
-                    ADD TO WISHLIST
+                   hx-get="{% url 'users:login' %}?next={{ request.path }}"
+                   hx-target="#main-content"
+                   hx-push-url="true"
+                   class="w-full block bg-white text-black border border-black py-3 px-6 text-sm font-medium uppercase hover:bg-gray-100 transition-colors text-center"
+                   {% if not product.product_sizes.all %}style="pointer-events: none; opacity: 0.5;"{% endif %}>
+                    {% trans "ADD TO WISHLIST" %}
                 </a>
                 {% else %}
                 <button id="add-to-wishlist-btn"
@@ -165,10 +166,9 @@
                         class="w-full block bg-white text-black border border-black py-3 px-6 text-sm font-medium uppercase hover:bg-gray-100 transition-colors text-center"
                         onclick="handleWishlistClick(this)"
                         {% if not product.product_sizes.all %}disabled{% endif %}>
-                    ADD TO WISHLIST
+                    {% trans "ADD TO WISHLIST" %}
                 </button>
                 {% endif %}
-                
             </div>
 
             <!-- Hidden Wishlist Form -->
@@ -177,30 +177,29 @@
                 <input type="hidden" name="size_id" id="wishlist-size-id" value="">
             </form>
 
-
             <!-- Product Details -->
             <div class="border-t border-gray-200 pt-6">
-                <h3 class="text-sm font-medium text-gray-900 mb-3">DETAILS</h3>
+                <h3 class="text-sm font-medium text-gray-900 mb-3">{% trans "DETAILS" %}</h3>
                 <div class="prose prose-sm text-gray-600">
                     <p>{{ product.description|linebreaks }}</p>
-                    <p>Created: {{ product.created_at|date:"F d, Y" }}</p>
+                    <p>{% trans "Created:" %} {{ product.created_at|date:"F d, Y" }}</p>
                 </div>
             </div>
             
             <!-- Care Instructions -->
             <div class="border-t border-gray-200 pt-6">
-                <h3 class="text-sm font-medium text-gray-900 mb-3">CARE</h3>
+                <h3 class="text-sm font-medium text-gray-900 mb-3">{% trans "CARE" %}</h3>
                 <div class="prose prose-sm text-gray-600">
-                    <p>Professional dry clean only</p>
-                    <p>Do not bleach</p>
-                    <p>Iron at low temperature</p>
+                    <p>{% trans "Professional dry clean only" %}</p>
+                    <p>{% trans "Do not bleach" %}</p>
+                    <p>{% trans "Iron at low temperature" %}</p>
                 </div>
             </div>
 
             <div class="border-t border-gray-200 pt-6 mt-6">
             {% if reviews %}
             <div class="mb-8">
-                <h3 class="text-sm font-medium text-gray-900 mb-3">CUSTOMER REVIEWS</h3>
+                <h3 class="text-sm font-medium text-gray-900 mb-3">{% trans "CUSTOMER REVIEWS" %}</h3>
                 <div class="space-y-4">
                     {% for review in reviews %}
                     <div class="border-b pb-3">
@@ -230,7 +229,7 @@
     <!-- Related Products -->
     {% if related_products %}
     <div class="mt-16 border-t border-gray-200 pt-16">
-        <h2 class="text-xl font-bold tracking-tight text-gray-900 mb-8">YOU MAY ALSO LIKE</h2>
+        <h2 class="text-xl font-bold tracking-tight text-gray-900 mb-8">{% trans "YOU MAY ALSO LIKE" %}</h2>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {% for related_product in related_products %}
             <div class="product-card group cursor-pointer" 
@@ -244,7 +243,7 @@
                              class="product-image w-full h-full object-cover">
                     {% else %}
                         <div class="product-image w-full h-full bg-gray-200 flex items-center justify-center">
-                            <span class="text-gray-400 text-sm">No Image</span>
+                            <span class="text-gray-400 text-sm">{% trans "No Image" %}</span>
                         </div>
                     {% endif %}
                 </div>
@@ -259,6 +258,7 @@
     </div>
     {% endif %}
 </main>
+
 
 <style>
     .size-radio:checked + label {
@@ -299,27 +299,44 @@
 
 </style>
 
+<script src="{% url 'javascript-catalog' %}"></script>
 
 <script>
+const _  = (typeof gettext !== 'undefined') ? gettext : (s)=>s;
+const _n = (typeof ngettext !== 'undefined') ? ngettext : (s,p,n)=> (n===1?s:p);
+const __ = (fmt, obj) => {
+  if (typeof interpolate !== 'undefined') return interpolate(fmt, obj, true);
+  return fmt.replace(/%\((\w+)\)s/g, (_, k) => obj[k]); // fallback
+};
+
+
+
+function getRoot() {
+  return document.getElementById('product-detail-root');
+}
+
+
   let selectedSize = null;
   let selectedSizeId = null;
 
   function changeMainImage(src) {
-    const mainImg = document.querySelector('.aspect-square img');
+    const root = getRoot();
+    const mainImg = root?.querySelector('.aspect-square img');
     if (mainImg) mainImg.src = src;
-  }
+}
 
   function updateSelectedSize() {
-    const radios = document.querySelectorAll('.size-radio');
-    const checked = Array.from(radios).find(r => r.checked && !r.disabled);
-    if (checked) {
-      selectedSize = checked.dataset.size;
-      selectedSizeId = checked.value;
-    } else {
-      selectedSize = null;
-      selectedSizeId = null;
-    }
+  const root = getRoot();
+  const radios = root?.querySelectorAll('.size-radio') || [];
+  const checked = Array.from(radios).find(r => r.checked && !r.disabled);
+  if (checked) {
+    selectedSize = checked.dataset.size;
+    selectedSizeId = checked.value;
+  } else {
+    selectedSize = null;
+    selectedSizeId = null;
   }
+}
 
   function notify(msg){ if (typeof showNotification === 'function') showNotification(msg); }
 
@@ -346,7 +363,7 @@
     updateSelectedSize();
 
     if (!selectedSizeId) {
-        showNotification('Please select a size');
+        showNotification(_('Please select a size'));
         return;
     }
 
@@ -369,20 +386,13 @@
         htmx.ajax('GET', '{% url "cart:cart_modal" %}', { target: '#cart-container', swap: 'innerHTML' });
         }
     })
-    .catch(() => showNotification('Error adding to cart'));
+    .catch(() => showNotification(_('Error adding to cart')));
     }
-
-    document.addEventListener('click', (e) => {
-        const btn = e.target.closest('#add-to-cart-btn');
-        if (!btn) return;
-        e.preventDefault();
-        addToCart();
-    });
 
 
   async function addToWishlist() {
     const checked = document.querySelector('input[name="size_id"]:checked');
-    if (!checked) return notify('Please select a size');
+    if (!checked) return notify(_('Please select a size'));
 
     const sizeId = checked.value;
     const productId = document.getElementById('add-to-wishlist-btn')?.dataset.productId;
@@ -399,17 +409,17 @@
       });
       const data = await resp.json();
       if (data.success) {
-        notify(data.message || 'Added to wishlist');
+        notify(data.message || _('Added to wishlist'));
         if (window.htmx) {
           htmx.ajax('GET', '/wishlist/modal/', { target: '#wishlist-container', swap: 'innerHTML' });
         }
         const countSpan = document.querySelector('#wishlist-button #wishlist-count');
         if (countSpan && data.count != null) countSpan.textContent = data.count;
       } else {
-        notify(data.error || 'Something went wrong');
+        notify(data.error || _('Something went wrong'));
       }
     } catch {
-      notify('Error adding to wishlist');
+      notify(_('Error adding to wishlist'));
     }
   }
 
@@ -421,16 +431,18 @@
   }
 
   function initializeSizeRadios() {
-  const addBtn = document.getElementById('add-to-cart-btn');
-  if (!addBtn) return; // не сме на product detail -> нищо не правим
+  const root = getRoot();
+  if (!root) return;
 
-  const radios = document.querySelectorAll('.size-radio');
+  const addBtn = root.querySelector('#add-to-cart-btn');
+  if (!addBtn) return;
+
+  const radios = root.querySelectorAll('.size-radio');
 
   if (!radios.length) {
     addBtn.disabled = true;
     addBtn.classList.add('opacity-50','cursor-not-allowed');
-    // Показваме тост САМО ако реално сме на product detail (имаме addBtn)
-    showNotification('No sizes available');
+    showNotification(_('No sizes available'));
     return;
   }
 
@@ -438,13 +450,17 @@
   if (!available.length) {
     addBtn.disabled = true;
     addBtn.classList.add('opacity-50','cursor-not-allowed');
-    showNotification('All sizes are out of stock');
+    showNotification(_('All sizes are out of stock'));
     return;
   }
 
   let checked = Array.from(radios).find(r => r.checked && !r.disabled);
   if (!checked) { available[0].checked = true; checked = available[0]; }
   updateSelectedSize();
+
+  // активирай бутона веднага
+  addBtn.disabled = false;
+  addBtn.classList.remove('opacity-50','cursor-not-allowed');
 
   radios.forEach(r => {
     r.addEventListener('change', function() {
@@ -455,7 +471,7 @@
     });
   });
 }
-
+initializeSizeRadios();
 
   document.addEventListener('DOMContentLoaded', () => {
     initializeSizeRadios();
@@ -473,7 +489,7 @@
     if (wishlistForm && hiddenSizeInput) {
       wishlistForm.addEventListener('submit', function (e) {
         const selected = Array.from(sizeInputs).find(input => input.checked);
-        if (!selected) { e.preventDefault(); notify('Please select a size before adding to wishlist'); return; }
+        if (!selected) { e.preventDefault(); notify(_('Please select a size before adding to wishlist')); return; }
         hiddenSizeInput.value = selected.value;
       });
     }
@@ -535,7 +551,7 @@
         const hips   = parseInt(hipsSel.value, 10)  || null;
 
         if (!height || !weight) {
-            notify('Please select height and weight');
+            notify(_('Please select height and weight'));
             return;
         }
 
@@ -606,13 +622,16 @@
         const span = document.getElementById('fms-reco');
         if (span) span.textContent = size;
         if (box)  box.classList.remove('hidden');
-        if (typeof showNotification === 'function') showNotification(`Recommended size: ${size}`);
+        if (typeof showNotification === 'function') {
+        const msg = __( _('Recommended size: %(size)s'), { size });
+        showNotification(msg);
+        }
     }
-
     // маркира наличния или най-близкия размер
     function fmsSelectSizeRadio(targetSize) {
+        const root = getRoot();
         const order  = ['XS','S','M','L','XL','XXL'];
-        const radios = Array.from(document.querySelectorAll('.size-radio'));
+        const radios = Array.from((root?.querySelectorAll('.size-radio')) || []);
         if (!radios.length) return;
 
         const available = radios.filter(r => !r.disabled);
@@ -722,4 +741,16 @@
     document.addEventListener('DOMContentLoaded', ()=> enhanceFmsDropdowns());
     document.addEventListener('htmx:afterSwap', e=> enhanceFmsDropdowns(e.target));
     })();
+
+    document.addEventListener('click', function (e) {
+  const btn = e.target.closest('#add-to-cart-btn');
+  if (!btn) return;
+
+  const root = getRoot();
+  // гаранция, че кликът е в текущия product detail (не в модали/други фрагменти)
+  if (!root || !root.contains(btn)) return;
+
+  e.preventDefault();
+  addToCart();
+});
 </script>

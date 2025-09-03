@@ -1,4 +1,4 @@
-{% load static %}
+{% load static i18n %}
 
 <main class="mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <div class="max-w-7xl mx-auto">
@@ -12,15 +12,15 @@
                            hx-get="{% url 'main:index' %}" 
                            hx-target="#main-content" 
                            hx-push-url="true"
-                           class="hover:text-gray-900">HOME</a>
+                           class="hover:text-gray-900">{% trans "HOME" %}</a>
                         <span class="mx-2">/</span>
-                        <span class="font-medium">CHECKOUT</span>
+                        <span class="font-medium">{% trans "CHECKOUT" %}</span>
                     </nav>
                 </div>
 
                 <!-- Contact Information -->
                 <div class="bg-white p-6">
-                    <h2 class="text-lg font-bold text-black mb-4">Contact Information</h2>
+                    <h2 class="text-lg font-bold text-black mb-4">{% trans "Contact Information" %}</h2>
                     
                     <form method="post" id="order-form" hx-post="{% url 'orders:checkout' %}" hx-target="#main-content" hx-swap="outerHTML">
                         <input type="hidden" name="discount_code" id="hidden-discount-code">
@@ -28,7 +28,7 @@
                         <div class="bg-white p-6">
                             <div class="space-y-4">
                                 <div>
-                                    <label for="{{ form.email.id_for_label }}" class="block text-sm font-medium text-black mb-1">Email</label>
+                                    <label for="{{ form.email.id_for_label }}" class="block text-sm font-medium text-black mb-1">{% trans "Email" %}</label>
                                     {{ form.email }}
                                     {% if form.email.errors %}
                                         <div class="text-red-500 text-sm mt-1">{{ form.email.errors }}</div>
@@ -36,17 +36,17 @@
                                 </div>
                                 <label class="flex items-center space-x-2 cursor-pointer">
                                     <input type="checkbox" name="newsletter" class="h-4 w-4 text-black border-black focus:ring-0">
-                                    <span class="text-sm text-black">Send me news and offers</span>
+                                    <span class="text-sm text-black">{% trans "Send me news and offers" %}</span>
                                 </label>
                             </div>
                         </div>
                     
                         <!-- Shipping Address -->
                         <div class="bg-white p-6">
-                            <h2 class="text-lg font-bold text-black mb-4">Shipping Address</h2>
+                            <h2 class="text-lg font-bold text-black mb-4">{% trans "Shipping Address" %}</h2>
                             <div class="space-y-4">
                                 <div>
-                                    <label for="{{ form.country.id_for_label }}" class="block text-sm font-medium text-black mb-1">Country/Region</label>
+                                    <label for="{{ form.country.id_for_label }}" class="block text-sm font-medium text-black mb-1">{% trans "Country/Region" %}</label>
                                     {{ form.country }}
                                     {% if form.country.errors %}
                                         <div class="text-red-500 text-sm mt-1">{{ form.country.errors }}</div>
@@ -54,14 +54,14 @@
                                 </div>
                                 <div class="grid grid-cols-2 gap-4">
                                     <div>
-                                        <label for="{{ form.first_name.id_for_label }}" class="block text-sm font-medium text-black mb-1">First Name</label>
+                                        <label for="{{ form.first_name.id_for_label }}" class="block text-sm font-medium text-black mb-1">{% trans "First Name" %}</label>
                                         {{ form.first_name }}
                                         {% if form.first_name.errors %}
                                             <div class="text-red-500 text-sm mt-1">{{ form.first_name.errors }}</div>
                                         {% endif %}
                                     </div>
                                     <div>
-                                        <label for="{{ form.last_name.id_for_label }}" class="block text-sm font-medium text-black mb-1">Last Name</label>
+                                        <label for="{{ form.last_name.id_for_label }}" class="block text-sm font-medium text-black mb-1">{% trans "Last Name" %}</label>
                                         {{ form.last_name }}
                                         {% if form.last_name.errors %}
                                             <div class="text-red-500 text-sm mt-1">{{ form.last_name.errors }}</div>
@@ -69,19 +69,14 @@
                                     </div>
                                 </div>
                                 <div class="relative">
-                                    <label for="{{ form.address1.id_for_label }}" class="block text-sm font-medium text-black mb-1">Address</label>
+                                    <label for="{{ form.address1.id_for_label }}" class="block text-sm font-medium text-black mb-1">{% trans "Address" %}</label>
                                     {{ form.address1 }}
                                     {% if form.address1.errors %}
                                         <div class="text-red-500 text-sm mt-1">{{ form.address1.errors }}</div>
                                     {% endif %}
-                                    <div class="absolute right-3 top-10 transform -translate-y-1/2">
-                                        <svg class="w-4 h-4 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                                        </svg>
-                                    </div>
                                 </div>
                                 <div>
-                                    <label for="{{ form.address2.id_for_label }}" class="block text-sm font-medium text-black mb-1">Apartment, suite, etc. (optional)</label>
+                                    <label for="{{ form.address2.id_for_label }}" class="block text-sm font-medium text-black mb-1">{% trans "Apartment, suite, etc. (optional)" %}</label>
                                     {{ form.address2 }}
                                     {% if form.address2.errors %}
                                         <div class="text-red-500 text-sm mt-1">{{ form.address2.errors }}</div>
@@ -89,43 +84,26 @@
                                 </div>
                                 <div class="grid grid-cols-3 gap-4">
                                     <div>
-                                        <label for="{{ form.city.id_for_label }}" class="block text-sm font-medium text-black mb-1">City</label>
+                                        <label for="{{ form.city.id_for_label }}" class="block text-sm font-medium text-black mb-1">{% trans "City" %}</label>
                                         {{ form.city }}
-                                        {% if form.city.errors %}
-                                            <div class="text-red-500 text-sm mt-1">{{ form.city.errors }}</div>
-                                        {% endif %}
                                     </div>
                                     <div>
-                                        <label for="{{ form.province.id_for_label }}" class="block text-sm font-medium text-black mb-1">State/Province</label>
+                                        <label for="{{ form.province.id_for_label }}" class="block text-sm font-medium text-black mb-1">{% trans "State/Province" %}</label>
                                         {{ form.province }}
-                                        {% if form.province.errors %}
-                                            <div class="text-red-500 text-sm mt-1">{{ form.province.errors }}</div>
-                                        {% endif %}
                                     </div>
                                     <div>
-                                        <label for="{{ form.postal_code.id_for_label }}" class="block text-sm font-medium text-black mb-1">Postal Code</label>
+                                        <label for="{{ form.postal_code.id_for_label }}" class="block text-sm font-medium text-black mb-1">{% trans "Postal Code" %}</label>
                                         {{ form.postal_code }}
-                                        {% if form.postal_code.errors %}
-                                            <div class="text-red-500 text-sm mt-1">{{ form.postal_code.errors }}</div>
-                                        {% endif %}
                                     </div>
                                 </div>
                                 <div class="relative">
-                                    <label for="{{ form.phone.id_for_label }}" class="block text-sm font-medium text-black mb-1">Phone</label>
+                                    <label for="{{ form.phone.id_for_label }}" class="block text-sm font-medium text-black mb-1">{% trans "Phone" %}</label>
                                     {{ form.phone }}
-                                    {% if form.phone.errors %}
-                                        <div class="text-red-500 text-sm mt-1">{{ form.phone.errors }}</div>
-                                    {% endif %}
-                                    <div class="absolute right-3 top-10 transform -translate-y-1/2">
-                                        <svg class="w-4 h-4 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                        </svg>
-                                    </div>
                                 </div>
                                 <div class="space-y-3">
                                     <label class="flex items-center space-x-2 cursor-pointer">
                                         <input type="checkbox" name="save_info" class="h-4 w-4 text-black border-black focus:ring-0">
-                                        <span class="text-sm text-black">Save information for next time</span>
+                                        <span class="text-sm text-black">{% trans "Save information for next time" %}</span>
                                     </label>
                                 </div>
                             </div>
@@ -139,23 +117,15 @@
                                     value="create_order" 
                                     class="w-full bg-black text-white py-4 px-6 font-bold hover:bg-gray-800 transition-colors payment-button"
                                     onclick="document.getElementById('payment_provider').value='stripe'">
-                                Pay with Stripe
+                                {% trans "Pay with Stripe" %}
                             </button>
-                            <!-- <button type="submit" 
-                                    form="order-form"
-                                    name="create_order" 
-                                    value="create_order" 
-                                    class="w-full bg-black text-white py-4 px-6 font-bold hover:bg-gray-800 transition-colors payment-button"
-                                    onclick="document.getElementById('payment_provider').value='heleket'">
-                                Pay with Heleket
-                            </button> -->
                             <input type="hidden" name="payment_provider" id="payment_provider">
                         </div>
                     </form>
 
                 <!-- Refund Policy -->
                 <div class="text-center">
-                    <a href="#" class="text-sm text-gray-600 underline hover:text-gray-800">Refund Policy</a>
+                    <a href="#" class="text-sm text-gray-600 underline hover:text-gray-800">{% trans "Refund Policy" %}</a>
                 </div>
             </div>
         </div>
@@ -183,38 +153,39 @@
             <!-- Order Summary -->
             <div id="order-summary" class="space-y-3 border-t pt-4">
                 <div class="flex justify-between text-sm">
-                    <span>Subtotal • {{ cart.total_items }} item{{ cart.total_items|pluralize }}</span>
+                    <span>{% blocktrans count count=cart.total_items %}Subtotal • {{ count }} item{% plural %}Subtotal • {{ count }} items{% endblocktrans %}</span>
                     <span>€{{ total_price|floatformat:2 }}</span>
                 </div>
                 
                 <div class="flex justify-between text-sm">
-                    <span>Shipping</span>
-                    <span class="text-gray-600">Enter shipping address</span>
+                    <span>{% trans "Shipping" %}</span>
+                    <span class="text-gray-600">{% trans "Enter shipping address" %}</span>
                 </div>
                 
                 <div class="flex justify-between items-center text-sm py-1">
-                    <span class="text-gray-700 font-medium">Promo Code</span>
+                    <span class="text-gray-700 font-medium">{% trans "Promo Code" %}</span>
                     <div class="flex items-center gap-2">
                         <input type="text" id="discount-code-input" name="discount_code"
                             class="w-40 px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-black focus:border-black"
-                            placeholder="Enter code">
+                            placeholder="{% trans 'Enter code' %}">
                         <button type="button" onclick="applyDiscountCode()"
                                 class="px-4 py-2 bg-black text-white text-sm rounded-md hover:bg-gray-800 transition">
-                        Apply
+                            {% trans "Apply" %}
                         </button>
                     </div>
                 </div>
 
                 <div id="discount-row" class="flex-checkout justify-between-checkout text-sm-checkout hidden">
-                    <span class="summary-label-checkout text-green-700">Discount</span>
+                    <span class="summary-label-checkout text-green-700">{% trans "Discount" %}</span>
                     <span class="summary-value-checkout text-green-700">-€<span id="discount-amount">0.00</span></span>
                 </div>
 
+                <p id="discount-error" class="text-red-600 text-sm mt-1 hidden">{% trans "Invalid promo code." %}</p>
 
                 <div class="flex justify-between text-lg font-medium pt-3 border-t">
-                    <span>Total</span>
+                    <span>{% trans "Total" %}</span>
                     <div class="text-right">
-                        <span class="text-sm text-gray-600">EUR </span>
+                        <span class="text-sm text-gray-600">{% trans "EUR" %} </span>
                         <span id="total-value">€{{ total_price|floatformat:2 }}</span>
                     </div>
                 </div>
@@ -223,11 +194,13 @@
     </div>
 </main>
 
+
+<script src="{% url 'javascript-catalog' %}"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const paymentButtons = document.querySelectorAll('.payment-button');
         const paymentProviderInput = document.getElementById('payment_provider');
-        const form = document.getElementById('order-form');
+        const form = document.getElementById('order-form'); 
 
         paymentButtons.forEach(button => {
             button.addEventListener('click', function(e) {
@@ -238,8 +211,6 @@
         });
 
         form.addEventListener('submit', function(e) {
-            console.log('Form submitting with payment provider:', paymentProviderInput.value);
-
             // Проверка обязательных полей
             const requiredFields = ['email', 'first_name', 'last_name', 'address1', 'city', 'country', 'phone'];
             let isValid = true;
@@ -254,15 +225,14 @@
 
             if (!isValid) {
                 e.preventDefault();
-                alert('Please fill in all required fields');
+                alert(gettext('Please fill in all required fields'));
                 return false;
             }
 
-            // Проверка значения payment_provider
             if (!['stripe', 'heleket'].includes(paymentProviderInput.value)) {
                 e.preventDefault();
                 console.error('Invalid payment provider:', paymentProviderInput.value);
-                alert('Please select a valid payment provider');
+                alert(gettext('Please select a valid payment provider'));
                 return false;
             }
         });
@@ -273,26 +243,28 @@
     });
 
     function applyDiscountCode() {
-    const code = document.getElementById('discount-code-input').value.trim();
-    const subtotal = parseFloat({{ total_price|floatformat:2 }});
-    const message = document.getElementById('discount-message');
-    const discountRow = document.getElementById('discount-row');
-    const discountAmount = document.getElementById('discount-amount');
-    const totalValue = document.getElementById('total-value');
+        const code = document.getElementById('discount-code-input').value.trim();
+        const subtotal = parseFloat('{{ total_price|floatformat:2 }}'.replace(',', '.'));
+        const discountRow   = document.getElementById('discount-row');
+        const discountAmount= document.getElementById('discount-amount');
+        const totalValue    = document.getElementById('total-value');
+        const errorEl       = document.getElementById('discount-error');
 
-    if (!code) return;
+        if (!code) return;
 
-    fetch('/orders/api/validate-discount-code/', {
+        fetch('/orders/api/validate-discount-code/', {
         method: 'POST',
         headers: {
         'Content-Type': 'application/json',
         'X-CSRFToken': getCookie('csrftoken')
         },
         body: JSON.stringify({ code: code, subtotal: subtotal })
-    })
-    .then(res => res.json())
-    .then(data => {
+        })
+        .then(res => res.json())
+        .then(data => {
         if (data.valid) {
+        // покажи намалението
+        errorEl.classList.add('hidden');
         const discount = data.discount_value.toFixed(2);
         const total = (subtotal - data.discount_value).toFixed(2);
 
@@ -301,9 +273,19 @@
         discountRow.classList.remove('hidden');
         document.getElementById('hidden-discount-code').value = code;
         } else {
-        alert('Невалиден код.');
-        }
-    });
+                discountRow.classList.add('hidden');
+                errorEl.textContent = data.error || gettext('Invalid promo code');
+                errorEl.classList.remove('hidden');
+                document.getElementById('hidden-discount-code').value = '';
+                totalValue.textContent = `€${subtotal.toFixed(2).replace('.', ',')}`;
+            }
+        })
+        .catch(() => {
+            discountRow.classList.add('hidden');
+            errorEl.textContent = gettext('Could not validate code');
+            errorEl.classList.remove('hidden');
+            totalValue.textContent = `€${subtotal.toFixed(2)}`;
+        });
     }
 
     function getCookie(name) {

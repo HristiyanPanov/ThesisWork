@@ -1,3 +1,5 @@
+{% load i18n %}
+
 <button id="modal-close" style="
     position: absolute;
     top: 20px;
@@ -12,8 +14,7 @@
     z-index: 1001;
 ">×</button>
 
-
-<h2 style="text-align: center; font-weight: 700; font-size: 22px;">GET THE LOOK</h2>
+<h2 style="text-align: center; font-weight: 700; font-size: 22px;">{% trans "GET THE LOOK" %}</h2>
 
 {% for entry in product_data %}
   <div style="display: flex; gap: 16px; align-items: center; margin-bottom: 20px;">
@@ -26,7 +27,7 @@
       <p style="margin: 4px 0;">{{ entry.product.color }}</p>
       <p style="font-weight: bold; margin: 4px 0;">€{{ entry.product.price }}</p>
       <select class="product-size-select" data-product-id="{{ entry.product.id }}" style="padding: 6px 10px; border-radius: 6px; border: 1px solid #ccc;">
-        <option value="">Select Size</option>
+        <option value="">{% trans "Select Size" %}</option>
         {% for ps in entry.sizes %}
             <option value="{{ ps.id }}">{{ ps.size.name }}</option>
         {% endfor %}
@@ -35,9 +36,4 @@
   </div>
 {% endfor %}
 
-
-<button id="add-to-cart-btn" class="add-to-cart-btn" disabled>
-  ADD TO CART
-</button>
-
-
+<button id="gtl-add-btn" class="add-to-cart-btn gtl-add-btn" disabled>{% trans "ADD TO CART" %}</button>

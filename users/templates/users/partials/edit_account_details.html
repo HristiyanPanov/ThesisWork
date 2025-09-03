@@ -1,3 +1,4 @@
+{% load i18n %}
 <style>
     .dotted-input {
         border: none;
@@ -103,7 +104,7 @@
             type="submit"
             class="bg-gray-400 hover:bg-gray-500 text-white font-semibold py-2 px-4 transition-colors duration-200 text-sm tracking-wide"
         >
-            Save
+            {% trans "Save" %}
         </button>
         <button 
             type="button"
@@ -111,7 +112,7 @@
             hx-target="#account-details-content" 
             class="border-2 border-gray-300 hover:border-gray-400 text-gray-700 hover:text-gray-900 font-semibold py-2 px-4 transition-colors duration-200 text-sm tracking-wide"
         >
-            Cancel
+            {% trans "Cancel" %}
         </button>
     </div>
 </form>

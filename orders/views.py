@@ -80,11 +80,10 @@ class CheckoutView(CartMixin, View):
         discount_percent = 0
 
         if discount_code:
-            try:
-                subscriber = NewsletterSubscriber.objects.get(discount_code=discount_code)
+            code_raw = discount_code
+            exists = NewsletterSubscriber.objects.filter(discount_code__iexact=code_raw).exists()
+            if exists:
                 discount_percent = 10
-            except NewsletterSubscriber.DoesNotExist:
-                discount_percent = 0
 
         discount_value = subtotal * (Decimal(discount_percent) / Decimal('100'))
         total_price = subtotal - discount_value
@@ -167,18 +166,32 @@ class CheckoutView(CartMixin, View):
 
 @csrf_exempt
 def validate_discount_code(request):
-    if request.method == 'POST':
+    if request.method != 'POST':
+        return JsonResponse({'valid': False})
+
+    try:
+        data = json.loads(request.body or '{}')
+        code_raw = (data.get('code') or '').strip()
+
+        # нормализирай subtotal: махни валутни символи, замени запетая с точка
+        raw_subtotal = str(data.get('subtotal', 0))
+        cleaned = ''.join(ch for ch in raw_subtotal if (ch.isdigit() or ch in '.,-'))
+        cleaned = cleaned.replace(',', '.')
         try:
-            data = json.loads(request.body)
-            code = data.get('code', '').strip()
-            subtotal = float(data.get('subtotal', 0))
+            subtotal = float(cleaned)
+        except ValueError:
+            subtotal = 0.0
 
-            subscriber = NewsletterSubscriber.objects.get(discount_code=code)
-            discount_percent = 10
-            discount_value = round(subtotal * (discount_percent / 100), 2)
+        # case-insensitive валидиране на кода
+        valid = (
+            NewsletterSubscriber.objects.filter(discount_code__iexact=code_raw).exists()
+        )
 
-            return JsonResponse({'valid': True, 'discount_value': discount_value})
-        except NewsletterSubscriber.DoesNotExist:
+        if not valid:
             return JsonResponse({'valid': False})
-        except Exception as e:
-            return JsonResponse({'valid': False, 'error': str(e)})
+
+        discount_value = round(subtotal * 0.10, 2)
+        return JsonResponse({'valid': True, 'discount_value': discount_value})
+
+    except Exception as e:
+        return JsonResponse({'valid': False, 'error': str(e)})

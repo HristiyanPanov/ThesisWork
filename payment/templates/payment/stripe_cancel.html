@@ -1,7 +1,7 @@
 {% extends "main/base.html" %}
-{% load static %}
+{% load static i18n %}
 
-{% block title %}Order Cancelled{% endblock title %}
+{% block title %}{% trans "Order Cancelled" %}{% endblock title %}
 
 {% block content %}
     {% include "payment/stripe_cancel_content.html" %}

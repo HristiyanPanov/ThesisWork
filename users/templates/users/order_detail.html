@@ -1,10 +1,11 @@
 {% extends "main/base.html" %}
+{% load i18n %}
 
 {% block content %}
 <div class="min-h-screen p-8">
     <div class="max-w-6xl mx-auto">
         <h1 class="text-3xl font-bold text-gray-900 mb-8 text-center tracking-wide">
-            HI, {{ request.user.first_name|upper }} {{ request.user.last_name|upper }}
+            {% trans "HI," %} {{ request.user.first_name|upper }} {{ request.user.last_name|upper }}
         </h1>
 
         <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -19,7 +20,7 @@
                         hx-target="#main-content"
                         hx-push-url="true"
                         class="nav-link flex items-center text-gray-700 font-semibold text-sm tracking-wide hover:text-gray-900">
-                        ACCOUNT
+                        {% trans "ACCOUNT" %}
                         </a>
 
                         <!-- ORDER HISTORY -->
@@ -29,7 +30,7 @@
                         hx-target="#profile-main-content"
                         hx-push-url="true"
                         class="nav-link flex items-center text-gray-700 font-semibold text-sm tracking-wide hover:text-gray-900">
-                        ORDER HISTORY
+                        {% trans "ORDER HISTORY" %}
                         </a>
 
                         <li class="nav-item">
@@ -38,7 +39,7 @@
                                hx-target="#main-content"
                                hx-push-url="true"
                                class="flex items-center text-gray-700 font-semibold text-sm tracking-wide hover:text-gray-900">
-                                LOG OUT
+                                {% trans "LOG OUT" %}
                             </a>
                         </li>
                     </ul>
@@ -52,6 +53,8 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
 <script>
 (function () {
   function $all(sel){ return Array.from(document.querySelectorAll(sel)); }
@@ -90,4 +93,3 @@
 })();
 </script>
 
-{% endblock %}

@@ -1,14 +1,14 @@
+{% load i18n %}
 <div class="text-center py-20 text-gray-500">
     <svg class="mx-auto h-12 w-12 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
     </svg>
-    <p class="text-lg mb-4">Your wishlist is empty</p>
+    <p class="text-lg mb-4">{% trans "Your wishlist is empty" %}</p>
     <button type="button"
         onclick="closeWishlistModal();"
         class="text-sm underline text-gray-700">
-        Continue browsing
+        {% trans "Continue browsing" %}
     </button>
-
 </div>
 
 <script>

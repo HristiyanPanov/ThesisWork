@@ -1,3 +1,4 @@
+{% load i18n %}
 <div class="cart-item pb-8 border-b border-gray-200" id="wishlist-item-{{ item.id }}">
   <!-- Product Image and Details -->
   <div class="flex flex-col items-center">
@@ -8,7 +9,7 @@
              class="max-h-full max-w-full object-contain">
       {% else %}
         <div class="w-full h-full flex items-center justify-center">
-          <span class="text-gray-400">No Image</span>
+          <span class="text-gray-400">{% trans "No Image" %}</span>
         </div>
       {% endif %}
     </div>
@@ -16,32 +17,29 @@
     <!-- Product Info -->
     <div class="text-center">
       <h3 class="font-bold text-sm">{{ item.product.name|upper }}</h3>
-      <p class="text-xs">COLOR {{ item.product.color|upper }}</p>
-      <p class="text-xs">SIZE {{ item.product_size.size.name }}</p>
-      <p class="font-bold mt-1">${{ item.product.price }}</p>
+      <p class="text-xs">{% trans "COLOR" %} {{ item.product.color|upper }}</p>
+      <p class="text-xs">{% trans "SIZE" %} {{ item.product_size.size.name }}</p>
+      <p class="font-bold mt-1">€{{ item.product.price }}</p>
     
       <!-- Buttons Container -->
-    <div class="flex flex-col items-center mt-2">
-      <!-- Add to Cart Button -->
-      <button 
-          onclick="addWishlistItemToCart('{{ item.product.slug }}', {{ item.product_size.id }})"
-          class="text-xs text-gray-500 underline mb-1">
-          Add to Cart
-      </button>
+      <div class="flex flex-col items-center mt-2">
+        <!-- Add to Cart Button -->
+        <button 
+            onclick="addWishlistItemToCart('{{ item.product.slug }}', {{ item.product_size.id }})"
+            class="text-xs text-gray-500 underline mb-1">
+            {% trans "Add to Cart" %}
+        </button>
 
-      <!-- Remove Button -->
-      <button 
-          hx-post="{% url 'wishlist:remove' item.id %}" 
-          hx-target="#wishlist-container"
-          hx-swap="innerHTML"
-          hx-on="htmx:afterSwap: updateWishlistCountManually"
-          class="text-xs text-gray-500 underline block mt-1">
-          Remove
-      </button>
-
-    </div>
-
-
+        <!-- Remove Button -->
+        <button 
+            hx-post="{% url 'wishlist:remove' item.id %}" 
+            hx-target="#wishlist-container"
+            hx-swap="innerHTML"
+            hx-on="htmx:afterSwap: updateWishlistCountManually"
+            class="text-xs text-gray-500 underline block mt-1">
+            {% trans "Remove" %}
+        </button>
+      </div>
     </div>
   </div>
 </div>

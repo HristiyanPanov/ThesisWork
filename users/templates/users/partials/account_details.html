@@ -1,9 +1,19 @@
+{% load i18n %}
+
 <div class="space-y-2">
-    <p class="text-sm text-gray-700">Default Address</p>
+    <p class="text-sm text-gray-700">{% trans "Default Address" %}</p>
     <p class="text-sm text-gray-700">{{ user.first_name }} {{ user.last_name }}</p>
-    <p class="text-sm text-gray-700">{{ user.address1|default:"" }} {{ user.address2|default:"" }}</p>
-    <p class="text-sm text-gray-700">{{ user.city|default:"" }}, {{ user.country|default:"Not specified" }}</p>
+
+    <p class="text-sm text-gray-700">
+        {{ user.address1|default:"" }} {{ user.address2|default:"" }}
+    </p>
+
+    {% trans "Not specified" as NOT_SPEC %}
+    <p class="text-sm text-gray-700">
+        {{ user.city|default:"" }}, {{ user.country|default:NOT_SPEC }}
+    </p>
 </div>
+
 <div class="mt-4 flex gap-4">
     <button 
         hx-get="{% url 'users:edit_account_details' %}" 
@@ -11,11 +21,12 @@
         hx-swap="innerHTML"
         class="bg-gray-400 hover:bg-gray-500 text-white font-semibold py-2 px-4 transition-colors duration-200 text-sm tracking-wide"
     >
-        Edit
+        {% trans "Edit" %}
     </button>
+
     <button 
         class="border-2 border-gray-300 hover:border-gray-400 text-gray-700 hover:text-gray-900 font-semibold py-2 px-4 transition-colors duration-200 text-sm tracking-wide"
     >
-        Delete
+        {% trans "Delete" %}
     </button>
 </div>

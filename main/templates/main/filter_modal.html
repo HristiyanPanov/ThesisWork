@@ -1,6 +1,7 @@
+{% load i18n %}
 <div class="p-6">
     <div class="flex justify-between items-center mb-6">
-        <h2 class="text-xl font-bold tracking-tight text-gray-900 uppercase">Filters</h2>
+        <h2 class="text-xl font-bold tracking-tight text-gray-900 uppercase">{% trans "Filters" %}</h2>
         <button class="text-gray-600 hover:text-gray-900"
                 onclick="document.getElementById('filter-modal').classList.add('hidden')">
             ×
@@ -15,7 +16,7 @@
         <div class="space-y-6">
             <!-- Color -->
             <div>
-                <h3 class="text-sm font-medium text-gray-900 mb-3">COLOR</h3>
+                <h3 class="text-sm font-medium text-gray-900 mb-3">{% trans "COLOR" %}</h3>
                 <input type="text" 
                        name="color" 
                        value="{{ filter_params.color|default:'' }}" 
@@ -24,26 +25,26 @@
 
             <!-- Price Range -->
             <div>
-                <h3 class="text-sm font-medium text-gray-900 mb-3">PRICE RANGE</h3>
+                <h3 class="text-sm font-medium text-gray-900 mb-3">{% trans "PRICE RANGE" %}</h3>
                 <div class="grid grid-cols-2 gap-4">
                     <input type="number" 
                            name="min_price" 
                            value="{{ filter_params.min_price|default:'' }}" 
-                           placeholder="Min" 
+                           placeholder="{% trans 'Min' %}" 
                            class="border border-gray-300 py-2 px-3 text-sm uppercase focus:outline-none focus:border-gray-900">
                     <input type="number" 
                            name="max_price" 
                            value="{{ filter_params.max_price|default:'' }}" 
-                           placeholder="Max" 
+                           placeholder="{% trans 'Max' %}" 
                            class="border border-gray-300 py-2 px-3 text-sm uppercase focus:outline-none focus:border-gray-900">
                 </div>
             </div>
 
             <!-- Size -->
             <div>
-                <h3 class="text-sm font-medium text-gray-900 mb-3">SIZE</h3>
+                <h3 class="text-sm font-medium text-gray-900 mb-3">{% trans "SIZE" %}</h3>
                 <select name="size" class="w-full border border-gray-300 py-2 px-3 text-sm uppercase focus:outline-none focus:border-gray-900">
-                    <option value="">Any Size</option>
+                    <option value="">{% trans "Any Size" %}</option>
                     {% for size in sizes %}
                     <option value="{{ size.name }}" {% if filter_params.size == size.name %}selected{% endif %}>
                         {{ size.name|upper }}
@@ -57,11 +58,11 @@
                 <button type="button" 
                         class="border border-gray-300 py-2 px-4 text-sm font-medium uppercase hover:border-gray-900 transition-colors"
                         onclick="document.getElementById('filter-modal').classList.add('hidden')">
-                    Cancel
+                    {% trans "Cancel" %}
                 </button>
                 <button type="submit" 
                         class="bg-black text-white py-2 px-4 text-sm font-medium uppercase hover:bg-gray-800 transition-colors">
-                    Apply Filters
+                    {% trans "Apply Filters" %}
                 </button>
             </div>
         </div>

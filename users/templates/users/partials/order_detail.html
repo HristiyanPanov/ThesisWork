@@ -1,24 +1,30 @@
 {% load custom_tags %}
+{% load i18n %}
+
 <div class="bg-white p-6 rounded-lg shadow-lg">
     <h2 class="text-xl font-semibold text-gray-900 mb-4 tracking-wide">
-        ORDER #{{ order.id }}
+        {% blocktrans with id=order.id %}ORDER #{{ id }}{% endblocktrans %}
     </h2>
+
     <div class="space-y-4">
-        <p class="text-sm text-gray-700">Placed on: {{ order.created_at|date:"F d, Y" }}</p>
-        <p class="text-sm text-gray-700">Status: {{ order.get_status_display }}</p>
-        <p class="text-sm text-gray-700">Payment Provider: {{ order.get_payment_provider_display }}</p>
-        <p class="text-sm text-gray-700">Total: €{{ order.total_price|floatformat:2 }}</p>
-        <p class="text-sm text-gray-700">Shipping Address:</p>
+        <p class="text-sm text-gray-700">{% trans "Placed on:" %} {{ order.created_at|date:"F d, Y" }}</p>
+        <p class="text-sm text-gray-700">{% trans "Status:" %} {{ order.get_status_display }}</p>
+        <p class="text-sm text-gray-700">{% trans "Payment Provider:" %} {{ order.get_payment_provider_display }}</p>
+        <p class="text-sm text-gray-700">{% trans "Total:" %} €{{ order.total_price|floatformat:2 }}</p>
+
+        <p class="text-sm text-gray-700">{% trans "Shipping Address:" %}</p>
         <p class="text-sm text-gray-700">
             {{ order.first_name }} {{ order.last_name }}<br>
             {{ order.address1|default:"" }} {{ order.address2|default:"" }}<br>
             {{ order.city|default:"" }}, {{ order.province|default:"" }} {{ order.postal_code|default:"" }}<br>
-            {{ order.country|default:"Not specified" }}
+            {{ order.country|default:_("Not specified") }}
         </p>
-        <p class="text-sm text-gray-700">Phone: {{ order.phone|default:"Not provided" }}</p>
-        <p class="text-sm text-gray-700">Email: {{ order.email }}</p>
+
+        <p class="text-sm text-gray-700">{% trans "Phone:" %} {{ order.phone|default:_("Not provided") }}</p>
+        <p class="text-sm text-gray-700">{% trans "Email:" %} {{ order.email }}</p>
         
-        <h3 class="text-lg font-semibold text-gray-900 mt-4">Items</h3>
+        <h3 class="text-lg font-semibold text-gray-900 mt-4">{% trans "Items" %}</h3>
+
         <div class="space-y-2">
             {% for item in order.items.all %}
             <div class="flex flex-col sm:flex-row gap-4 border-b border-gray-200 py-4">
@@ -28,50 +34,51 @@
                 {% if item.product.main_image %}
                     <img src="{{ item.product.main_image.url }}" alt="{{ item.product.name }}" class="w-full h-full object-cover">
                 {% else %}
-                    <div class="w-full h-full flex items-center justify-center text-gray-400">No Image</div>
+                    <div class="w-full h-full flex items-center justify-center text-gray-400">{% trans "No Image" %}</div>
                 {% endif %}
                 </div>
 
                 <!-- Details -->
                 <div class="flex-1 flex flex-col justify-between">
-                <div>
-                {% with review=user_reviews_by_product|get_item:item.product.id %}
-                {% if review %}
-                    <div class="flex items-center gap-1 mt-1">
-                    <div class="flex text-yellow-400 text-sm">
-                        {% for i in "12345"|slice:":review.rating"|make_list %}★{% endfor %}
-                    </div>
-                    <span class="text-xs text-gray-500">({{ review.rating }}/5)</span>
-                    </div>
-                {% endif %}
-                {% endwith %}
-                    <a href="{% url 'main:product_detail' item.product.slug %}" 
-                        hx-get="{% url 'main:product_detail' item.product.slug %}" 
-                        hx-target="#main-content" 
-                        hx-push-url="true"
-                        class="text-sm font-semibold text-gray-900 hover:underline">
-                        {{ item.product.name }}
-                    </a>
-                    <p class="text-sm text-gray-600">Size: {{ item.size.size.name }}</p>
-                    <p class="text-sm text-gray-600 mt-1">€{{ item.price|floatformat:2 }}</p>
-                    <p class="text-sm text-gray-800 font-semibold">Quantity: {{ item.quantity }}</p>
-                </div>
+                    <div>
+                        {% with review=user_reviews_by_product|get_item:item.product.id %}
+                        {% if review %}
+                            <div class="flex items-center gap-1 mt-1">
+                                <div class="flex text-yellow-400 text-sm">
+                                    {% for i in "12345"|slice:":review.rating"|make_list %}★{% endfor %}
+                                </div>
+                                <span class="text-xs text-gray-500">({{ review.rating }}/5)</span>
+                            </div>
+                        {% endif %}
+                        {% endwith %}
 
-                <div class="flex justify-between items-center mt-2">
-                  <div class="text-sm text-gray-400 italic"> </div>
+                        <a href="{% url 'main:product_detail' item.product.slug %}" 
+                           hx-get="{% url 'main:product_detail' item.product.slug %}" 
+                           hx-target="#main-content" 
+                           hx-push-url="true"
+                           class="text-sm font-semibold text-gray-900 hover:underline">
+                            {{ item.product.name }}
+                        </a>
 
-                  {% if item.product.id not in reviewed_product_ids %}
-                    <a href="#" class="review-btn" data-product-id="{{ item.product.id }}">
-                      Leave a review
-                    </a>
-                  {% else %}
-                    <span class="text-gray-400 cursor-not-allowed">Review submitted</span>
-                  {% endif %}
-                </div>
+                        <p class="text-sm text-gray-600">{% trans "Size:" %} {{ item.size.size.name }}</p>
+                        <p class="text-sm text-gray-600 mt-1">€{{ item.price|floatformat:2 }}</p>
+                        <p class="text-sm text-gray-800 font-semibold">{% trans "Quantity:" %} {{ item.quantity }}</p>
+                    </div>
+
+                    <div class="flex justify-between items-center mt-2">
+                        <div class="text-sm text-gray-400 italic"> </div>
+
+                        {% if item.product.id not in reviewed_product_ids %}
+                            <a href="#" class="review-btn" data-product-id="{{ item.product.id }}">
+                                {% trans "Leave a review" %}
+                            </a>
+                        {% else %}
+                            <span class="text-gray-400 cursor-not-allowed">{% trans "Review submitted" %}</span>
+                        {% endif %}
+                    </div>
                 </div>
             </div>
             {% endfor %}
-
         </div>
 
         <button 
@@ -80,40 +87,39 @@
             hx-push-url="true"
             class="mt-4 bg-gray-400 hover:bg-gray-500 text-white font-semibold py-2 px-4 transition-colors duration-200 text-sm tracking-wide"
         >
-            BACK TO ORDER HISTORY
+            {% trans "BACK TO ORDER HISTORY" %}
         </button>
     </div>
 </div>
 
-
 <div id="reviewModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
   <div class="bg-white rounded-2xl shadow-xl p-6 w-full max-w-xl relative">
     <button id="closeReviewModal" class="absolute top-2 right-2 text-gray-500 hover:text-black text-xl">&times;</button>
-    <h2 class="text-lg font-bold mb-4">Leave a Review</h2>
+    <h2 class="text-lg font-bold mb-4">{% trans "Leave a Review" %}</h2>
+
     <form id="reviewForm">
       {% csrf_token %}
       <input type="hidden" name="product_id" id="reviewProductId">
 
-      <label class="block font-medium">Rating:</label>
-      <!-- Скрита стойност за rating -->
-        <input type="hidden" name="rating" id="rating-input" value="0">
+      <label class="block font-medium">{% trans "Rating:" %}</label>
+      <input type="hidden" name="rating" id="rating-input" value="0">
 
-        <div id="star-rating" class="flex gap-1 text-2xl text-gray-300 cursor-pointer mb-4">
+      <div id="star-rating" class="flex gap-1 text-2xl text-gray-300 cursor-pointer mb-4">
         <span class="star" data-value="1">&#9733;</span>
         <span class="star" data-value="2">&#9733;</span>
         <span class="star" data-value="3">&#9733;</span>
         <span class="star" data-value="4">&#9733;</span>
         <span class="star" data-value="5">&#9733;</span>
-        </div>
+      </div>
 
-      <label class="block font-medium">Title:</label>
+      <label class="block font-medium">{% trans "Title:" %}</label>
       <input type="text" name="title" class="border rounded w-full p-2 mb-3" maxlength="50">
 
-      <label class="block font-medium">Review:</label>
+      <label class="block font-medium">{% trans "Review:" %}</label>
       <textarea name="content" class="border rounded w-full p-2 mb-3" rows="4" required></textarea>
 
       <button type="submit" class="bg-black text-white px-4 py-2 rounded hover:bg-gray-900">
-        SUBMIT REVIEW
+        {% trans "SUBMIT REVIEW" %}
       </button>
     </form>
   </div>
@@ -121,6 +127,7 @@
 
 
 
+<script src="{% url 'javascript-catalog' %}"></script>
 <script>
 function initStarRating() {
   const stars = document.querySelectorAll("#star-rating .star");
@@ -197,14 +204,14 @@ document.getElementById('reviewForm').addEventListener('submit', function(e) {
       if (link) {
         const span = document.createElement('span');
         span.className = 'text-gray-400 cursor-not-allowed';
-        span.textContent = 'Review submitted';
+        span.textContent = gettext('Review submitted');
         link.replaceWith(span);
       }
     } else if (data.errors) {
-      window.showNotification("Validation errors. Please check your input."); 
+      window.showNotification(gettext("Validation errors. Please check your input."));
       console.error("Validation errors:", data.errors);
     } else if (data.error) {
-      window.showNotification("Error: " + data.error);
+      window.showNotification(gettext("Error: ") + data.error);
     }
   });
 });
