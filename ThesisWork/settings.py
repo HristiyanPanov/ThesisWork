@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    'modeltranslation',
     'main',
     'cart',
     'users',
@@ -143,6 +144,12 @@ USE_I18N = True
 
 USE_TZ = True
 
+
+MODELTRANSLATION_DEFAULT_LANGUAGE = 'en'
+MODELTRANSLATION_LANGUAGES = ('en', 'bg')
+MODELTRANSLATION_FALLBACK_LANGUAGES = {
+    'default': ('bg', 'en'),
+}
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
