@@ -24,12 +24,13 @@
     </div>
   {% else %}
     <p class="text-sm text-gray-700">{% trans "You haven't placed any orders yet." %}</p>
-    <a
-        href="{% url 'main:index' %}"
-        hx-get="{% url 'main:index' %}"
-        hx-target="#profile-main-content"
-        hx-push-url="true"
-        class="mt-4 inline-block bg-gray-400 hover:bg-gray-500 text-white font-semibold py-2 px-4 transition-colors duration-200 text-sm tracking-wide"
-        >{% trans "SHOP NOW" %}</a>
+    <button
+      hx-get="{% url 'main:index' %}"
+      hx-target="#main-content"
+      hx-push-url="true"
+      class="mt-4 bg-gray-400 hover:bg-gray-500 text-white font-semibold py-2 px-4 transition-colors duration-200 text-sm tracking-wide">
+      {% trans "SHOP NOW" %}
+    </button>
   {% endif %}
+
 </div>

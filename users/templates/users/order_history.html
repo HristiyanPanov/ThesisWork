@@ -17,7 +17,8 @@
                         <a id="nav-account"
                           href="{% url 'users:profile' %}"
                           hx-get="{% url 'users:profile' %}"
-                          hx-target="#main-content"
+                          hx-target="#profile-main-content"
+                          {% comment %} hx-target="#main-content" {% endcomment %}
                           hx-push-url="true"
                           class="nav-link flex items-center text-gray-700 font-semibold text-sm tracking-wide hover:text-gray-900">
                           {% trans "ACCOUNT" %}

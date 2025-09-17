@@ -1,5 +1,5 @@
 from django.contrib import admin
-from modeltranslation.admin import TranslationAdmin  # 👈 ново
+from modeltranslation.admin import TranslationAdmin
 from .translation import *  # noqa  <-- гарантира, че моделите са регистрирани за превод
 
 from .models import (
@@ -15,14 +15,14 @@ class ProductSizeInline(admin.TabularInline):
     model = ProductSize
     extra = 0
 
-class ProductAdmin(TranslationAdmin):  # 👈 беше ModelAdmin
+class ProductAdmin(TranslationAdmin):
     list_display = ['name', 'category', 'color', 'price']
     list_filter = ['category', 'color']
     search_fields = ['name', 'color', 'description']
-    prepopulated_fields = {'slug': ('name',)}  # slug остава общ
+    prepopulated_fields = {'slug': ('name',)}
     inlines = [ProductImageInline, ProductSizeInline]
 
-class CategoryAdmin(TranslationAdmin):  # 👈 беше ModelAdmin
+class CategoryAdmin(TranslationAdmin):
     list_display = ['name', 'slug', 'parent']
     list_filter = ['parent']
     prepopulated_fields = {'slug': ('name',)}
@@ -44,7 +44,7 @@ class OutfitImageInline(admin.TabularInline):
     model = OutfitImage
     extra = 1
 
-class OutfitAdmin(TranslationAdmin):  # 👈 ако превеждаш Outfit.title
+class OutfitAdmin(TranslationAdmin):
     list_display = ['title', 'gender', 'created_at']
     list_filter = ['gender']
     inlines = [OutfitItemInline, OutfitImageInline]
